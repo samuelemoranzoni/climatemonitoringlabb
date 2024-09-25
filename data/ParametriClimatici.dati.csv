@@ -1,0 +1,56 @@
+centro1;oakham;12-12-2000
+vento;5;5;
+umidità;30.0;4;
+pressione;5.0;1;pressione bassa
+temperatura;20.0;5;giornata perfetta
+precipitazioni;20.0;2;periodo secco
+attitudine dei ghiacciai;20.0;3;
+massa dei ghiacciai;1000.0;3;i ghiacciai si stanno sciogliendo
+centro lombardia nord;varese;14-08-2024
+vento;8;1;vento piatto
+umidità;45.0;3;
+pressione;23.0;2;
+temperatura;33.0;5;
+precipitazioni;0.0;1;
+attitudine dei ghiacciai;2345.0;4;
+massa dei ghiacciai;345.0;4;
+centro sicilia;trapani;23-12-2023
+vento;2;1;
+umidità;34.0;4;forte
+pressione;12.0;2;trascurabile
+temperatura;34.0;5;notevole
+precipitazioni;0.0;1;assenti
+altitudine dei ghiacciai;2345.0;1;
+massa dei ghiacciai;0.0;1;
+centro sardo;villasimius;14-08-2024
+vento;22;3;
+umidità;12.0;2;
+pressione;34.0;4;
+temperatura;32.0;5;
+precipitazioni;2.0;1;quasi assenti
+altitudine dei ghiacciai;0.0;1;
+massa dei ghiacciai;0.0;1;
+centro sardo;sassari;
+vento;Parametro non specificato nel momento della rivelazione;1;
+umidità;-1.0;1;
+pressione;-1.0;1;
+temperatura;-1.0;1;
+precipitazioni;-1.0;1;
+altitudine dei ghiacciai;-1.0;1;
+massa dei ghiacciai;-1.0;1;
+centro sardo;villasimius;12-08-2024
+vento;2;2;2
+umidità;2.0;2;2
+pressione;2.0;2;2
+temperatura;23.0;2;mite
+precipitazioni;3.0;1;quasi assenti
+altitudine dei ghiacciai;0.0;1;
+massa dei ghiacciai;0.0;1;
+centro verbano;luino;14-08-2024
+vento;2;3;
+umidità;4.0;3;
+pressione;56.0;3;
+temperatura;32.0;5;
+precipitazioni;1.0;3;
+altitudine dei ghiacciai;2398.0;4;
+massa dei ghiacciai;0.0;1;
