@@ -46,12 +46,13 @@ public class DatabaseConnection {
             System.err.println("Errore: Il codice fiscale deve essere esattamente di 16 caratteri.");
             return new OperatoreRegistrato(-5);  // Codice errore per codice fiscale non valido
         }
+        /*
         //controllo che siano stati forniti valori non nulli per la consistenza dei dati
         if(nome == null || cognome == null || codiceFiscale == null || email==null || userid==null || password==null ){
             System.err.println("i campi sono nulli");
             return new OperatoreRegistrato(-6); //codice errore per campi nulli : vincolo NOT NULL
         }
-
+*/
         String sql = "INSERT INTO OperatoriRegistrati (nome, cognome, codice_fiscale, email, userid, password, centro_monitoraggio_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = connect();
@@ -287,11 +288,12 @@ public class DatabaseConnection {
             System.out.println("Errore: sono state inserite aree non registrate");
             return -3; //errore codice 3 , l'utente inserisce un area da rilevare non esistente nel database delle area registrate
         }
+        /*
        if(nome==null || indirizzo==null ){
            System.err.println("i campi nome , indirizzo ed aree interesse non possono essere vuoti");
            return -4; //errore codice 4 , l'utente ha inserito valori nulli per campi di tipo not null
 
-       }
+       } */
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -372,7 +374,7 @@ public class DatabaseConnection {
 
     }
     // Metodo per inserire i parametri climatici inclusa la massa dei ghiacciai: nota bene i parametri di tipo float non possono avere piu di 3 cifre prima della virgola
-    public int insertParametriClimatici(int centroMonitoraggio_id, String denominazione_ufficiale_area, int operatore_id, String dataRilevazione,
+    public synchronized int insertParametriClimatici(int centroMonitoraggio_id, String denominazione_ufficiale_area, int operatore_id, String dataRilevazione,
                                          float velocitaVento, int scoreVento, String notaVento,
                                          float umidita, int scoreUmidita, String notaUmidita,
                                          float pressione, int scorePressione, String notaPressione,
@@ -529,7 +531,7 @@ public class DatabaseConnection {
     }
 
 
-    public int insertCoordinateMonitoraggio(float latitudine, float longitudine,
+    public synchronized int insertCoordinateMonitoraggio(float latitudine, float longitudine,
                                             String denominazioneUfficiale, String stato) {
         String sql = "INSERT INTO CoordinateMonitoraggio (latitudine, longitudine, denominazione_ufficiale, stato) " +
                 "VALUES (?, ?, ?, ?)";
@@ -745,7 +747,37 @@ return risultati;
 
     public static void main(String[] args) {
         DatabaseConnection dc = new DatabaseConnection();
+        List<ParametriClimatici> risultati2 = dc.visualizzaDatiClimatici("Posillipo");
+        for (ParametriClimatici pc : risultati2){
+            System.out.println(pc.toString());
+        }
+        List<ParametriClimatici> risultati3 = dc.visualizzaDatiClimatici("posillipo");
+        for (ParametriClimatici pc : risultati3){
+            System.out.println( "secondo test , np lettera minuscola "  +  pc.toString());
+        }
+        List<ParametriClimatici> risultati4 = dc.visualizzaDatiClimatici("canegrate");
+        for (ParametriClimatici pc : risultati4){
+            System.out.println("controllo area non esistente " + pc.toString());
+        }
 
+        List<AreaGeografica> ricercaperarea = dc.cercaAreaGeograficaPerDenominazione("Posillipo");
+        for (AreaGeografica aa : ricercaperarea){
+            System.out.println("ricerca corretta per denominazione" + aa.toString());
+        }
+        List<AreaGeografica> ricercaperarea2 = dc.cercaAreaGeograficaPerDenominazione("Posilliopo");
+        for (AreaGeografica ab : ricercaperarea2){
+            System.out.println("ricerca erratA per denominazione" + ab.toString());
+        }
+
+        List<AreaGeografica> risultati = dc.cercaAreaGeograficaPerStato("Italia");
+        for(AreaGeografica ag : risultati){
+            System.out.println(ag.toString());
+
+        }
+
+        dc.cercaAreaGeograficaPerStato("debe");
+
+        dc.cercaPerCoordinate(231,2);
         // Test di inserimento parametri climatici
         System.out.println("Test di inserimento parametri climatici:");
 
@@ -788,4 +820,6 @@ dei valori stringhe laddove èrichiesto un valore di tipo int
 
  */
     }
+
+
 }

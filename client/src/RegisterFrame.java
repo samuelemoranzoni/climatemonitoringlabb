@@ -2,11 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class RegisterFrame extends JFrame {
 
     private JTextField nomeField, cognomeField, emailField, codiceFiscaleField, useridField, centroMonitoraggioField;
     private JPasswordField passwordField;
+
+    ClientCM client;
 
     public RegisterFrame() {
         setTitle("Registrazione Operatore");
@@ -54,7 +57,29 @@ public class RegisterFrame extends JFrame {
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                registrazioneOperatore();
+                //registrazioneOperatore();
+                try {
+
+                    client=new ClientCM();
+                    client.writeObject("Registrazione");
+                    client.writeObject(nomeField.getText().trim());
+                    client.writeObject( cognomeField.getText().trim());
+                    client.writeObject(codiceFiscaleField.getText().trim());
+                    client.writeObject(emailField.getText().trim());
+                    client.writeObject(useridField.getText().trim());
+                    client.writeObject(passwordField.getPassword());
+                    client.writeObject(centroMonitoraggioField.getText());
+                    int risposta=(int)client.readObject();
+                    if(risposta > 0){
+
+                        System.out.println("registrazione effettuata");
+                    }
+                    client.close();
+                } catch (IOException | ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+
                 new AccessoFrame();
             }
         });
@@ -69,6 +94,7 @@ public class RegisterFrame extends JFrame {
                 dispose();  // Chiude la finestra corrente
             }
         });
+
         JPanel panel2=new JPanel();
         panel2.setLayout(new FlowLayout());
         JLabel obbligatoriLabel = new JLabel("I campi contrassegnati da \"*\" sono da compilare obbligatoriamente.");
@@ -87,7 +113,7 @@ public class RegisterFrame extends JFrame {
         String userid = useridField.getText().trim();
         String password = new String(passwordField.getPassword());
         String centroMonitoraggio = centroMonitoraggioField.getText().trim();
-
+        JOptionPane.showMessageDialog(this, "registrazione avvennuta on successo", "Errore", JOptionPane.ERROR_MESSAGE);
         // Verifica dei campi obbligatori
         if (nome.isEmpty() || cognome.isEmpty() || codiceFiscale.isEmpty() || email.isEmpty() || userid.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Tutti i campi tranne il centro di monitoraggio sono obbligatori.", "Errore", JOptionPane.ERROR_MESSAGE);
