@@ -4,15 +4,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class RicercaVisualizzazioneFrame extends JFrame {
+public class RicercaVisualizzazioneFrame extends JFrame { /*
     private JTextField queryField;
     private JComboBox<String> areaComboBox;
     private JTextArea resultArea;
     private JLabel statusLabel;
     private SistemaRicerca sistemaRicerca = new SistemaRicerca();
     private SistemaSelezione sistemaSelezione = new SistemaSelezione();
-
-    public RicercaVisualizzazioneFrame() {
+    JFrame previuosframe;
+    public RicercaVisualizzazioneFrame(JFrame frame) {
+        this.previuosframe=frame;
         setTitle("Ricerca e Visualizzazione Aree");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(600, 400);
@@ -95,7 +96,9 @@ public class RicercaVisualizzazioneFrame extends JFrame {
         buttonBack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 dispose();
+                previuosframe.setVisible(true);
             }
         });
         add(bottomPanel, BorderLayout.SOUTH);
@@ -107,8 +110,9 @@ public class RicercaVisualizzazioneFrame extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new RicercaVisualizzazioneFrame();
+
+                new RicercaVisualizzazioneFrame(new ClimateMonitoringGUI());
             }
         });
-    }
+    } */
 }

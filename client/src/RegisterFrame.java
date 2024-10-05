@@ -69,8 +69,8 @@ public class RegisterFrame extends JFrame {
                     client.writeObject(useridField.getText().trim());
                     client.writeObject(passwordField.getPassword());
                     client.writeObject(centroMonitoraggioField.getText());
-                    int risposta=(int)client.readObject();
-                    if(risposta > 0){
+                    OperatoreRegistrato op=(OperatoreRegistrato)client.readObject();
+                    if(op.getId() > 0){
 
                         System.out.println("registrazione effettuata");
                     }

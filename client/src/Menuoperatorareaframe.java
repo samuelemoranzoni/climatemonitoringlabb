@@ -2,62 +2,92 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 class Menuoperatorareaframe extends JFrame {
-JFrame previousframe;
+    JFrame previousframe;
+
     public Menuoperatorareaframe(JFrame frame) {
-        this.previousframe=frame; //salva un riferimento al frame precedente
+        this.previousframe = frame;
         setTitle("Area Operatori");
-        setSize(400, 300);
+        setSize(800, 400);  // Increased width for more horizontal space
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JPanel panel1=new JPanel();
-        panel1.setLayout(new GridLayout(1, 2 ));
+        setLocationRelativeTo(null);
 
-        JButton accessbutton=new JButton("accedi");
+        // Main panel with GridBagLayout
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setBackground(Color.WHITE);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 30, 10, 30);  // Increased horizontal insets
 
-        JButton registerButton = new JButton("Registrati");
+        // Title
+        JLabel titolo = new JLabel("Benvenuto nell'area operatore");
+        titolo.setFont(new Font("Arial", Font.BOLD, 24));
+        titolo.setForeground(new Color(0, 90, 180));
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        mainPanel.add(titolo, gbc);
 
-        panel1.add(accessbutton);
-        panel1.add(registerButton);
+        // Subtitle - using HTML for wrapping with more width
+        JLabel subtitle = new JLabel("<html><div style='width: 600px; text-align: center;'>Se gestisci un centro di monitoraggio hai la possibilità di inserire dati climatici relativi a zone di interesse, accessibili dai cittadini.</div></html>");
+        subtitle.setFont(new Font("Arial", Font.PLAIN, 16));
+        gbc.insets = new Insets(20, 30, 30, 30);  // More vertical space after subtitle
+        mainPanel.add(subtitle, gbc);
 
+        // Buttons panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 10));  // More horizontal space between buttons
+        buttonPanel.setOpaque(false);
 
-        accessbutton.addActionListener(new ActionListener() {
+        JButton accessButton = createStyledButton("Accedi");
+        JButton registerButton = createStyledButton("Registrati");
+
+        buttonPanel.add(accessButton);
+        buttonPanel.add(registerButton);
+
+        gbc.insets = new Insets(0, 30, 20, 30);
+        mainPanel.add(buttonPanel, gbc);
+
+        // Back button at bottom
+        JButton backButton = createStyledButton("Torna Indietro");
+        backButton.setBackground(new Color(128, 128, 128));
+        gbc.insets = new Insets(10, 30, 20, 30);
+        mainPanel.add(backButton, gbc);
+
+        // Add action listeners
+        accessButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+               loginframein();
 
-                new AccessoFrame();
+            }
+        });
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                previousframe.setVisible(true);
+                dispose();
             }
         });
 
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new RegisterFrame();
-            }
-        });
-
-
-        JPanel panel2=new JPanel();
-        panel2.setLayout(new FlowLayout());
-        JButton buttonback=new JButton("torna indietro");
-        buttonback.addActionListener(new ActionListener() {
-                                         @Override
-                                         public void actionPerformed(ActionEvent e) {
-                                         previousframe.setVisible(true);
-                                         dispose();
-                                         }
-                                     }
-        );
-        panel2.add(buttonback);
-        this.setLayout(new BorderLayout());
-        add(panel1,BorderLayout.NORTH);
-        JLabel titolo = new JLabel("<html><div style='text-align: center;'>Benvenuto nell'area operatore,<br>se gestisci un centro di monitoraggio hai la possibilità di inserire dati di tipo climatici relativi a zone di interesse,<br>accessibili dai cittadini.</div></html>");
-        titolo.setFont(new Font("Arial", Font.BOLD, 16)); // Imposta il testo in grassetto e la dimensione a 16
-        titolo.setHorizontalAlignment(JLabel.CENTER); // Centra il testo
-        add(titolo, BorderLayout.CENTER);
-        add(panel2,BorderLayout.SOUTH);
+        add(mainPanel);
         setVisible(true);
     }
 
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.BOLD, 16));
+        button.setForeground(Color.WHITE);
+        button.setBackground(new Color(0, 120, 215));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setOpaque(true);
+        button.setPreferredSize(new Dimension(200, 40));
+        return button;
+    }
 
+
+
+    public void loginframein() {
+        new ClientLoginGUI(this).setVisible(true);
+        dispose();
+    }
 }

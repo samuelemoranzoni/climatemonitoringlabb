@@ -2,11 +2,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 public class AccessoFrame extends JFrame {
+    /*
     public String id_utente;
-    public AccessoFrame() {
+    public ClientCM cm;
+    public AccessoFrame() throws IOException {
         super("login");
+        cm=new ClientCM();
+
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(400, 300);
 
@@ -14,14 +21,14 @@ public class AccessoFrame extends JFrame {
         JPanel panel1 = new JPanel();
         panel1.setLayout(new GridLayout(2, 2));
         JLabel id = new JLabel("inserisci id");
-        JTextField idf = new JTextField();
-        idf.setPreferredSize(new Dimension(30, 30));
-        JLabel pass = new JLabel("password :");
+        JTextField idfield = new JTextField();
+        idfield.setPreferredSize(new Dimension(30, 30));
+        JLabel password = new JLabel("password :");
         JPasswordField jpas = new JPasswordField();
         jpas.setPreferredSize(new Dimension(30, 30));
         panel1.add(id);
         panel1.add(idf);
-        panel1.add(pass);
+        panel1.add(password);
         panel1.add(jpas);
 
         // Pannello per il pulsante di login
@@ -39,33 +46,49 @@ public class AccessoFrame extends JFrame {
         // Aggiungi un bordo vuoto attorno al pannello 2
         panel2.setBorder(BorderFactory.createEmptyBorder(20, 100, 20, 100));
 
-        // Listener per il pulsante di login
+        // Imposta il bottone di login con un listener
         buttlogin.addActionListener(new ActionListener() {
-            public String id; //serve per salvare un riferimento dell' id utente dell'utente che accede
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Recupera l'ID e la password dai campi di testo
-                String idc = idf.getText();
-                String passwordc = new String(jpas.getPassword());
-
-                this.id=idc;
-
-                // Crea un'istanza di SistemaAccesso
-                SistemaAccesso sistemaAccesso = new SistemaAccesso();
-
-                // Chiama il metodo accesso per verificare le credenziali
-                String result = sistemaAccesso.accesso(idc, passwordc);
-
-                // Mostra un messaggio in base al risultato
-                if (!result.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Login effettuato con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-                    new AreaRiservataOperatorFrame();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Userid o password errati. Riprova.", "Errore", JOptionPane.ERROR_MESSAGE);
-                }
+                performLogin();
             }
         });
+    }
+
+    private void performLogin() {
+        try {
+            // Recupera le credenziali inserite dall'utente
+            String id =
+            String password = new String(.getPassword());
+
+            // Controlla se i campi sono vuoti
+            if (email.isEmpty() || password.isEmpty()) {
+                statusLabel.setText("Inserisci email e password!");
+                return;
+            }
+
+            // Connessione al server RMI
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099); // Assicurati che l'indirizzo e la porta siano corretti
+            RemoteService stub = (RemoteService) registry.lookup("RemoteService");
+
+            // Chiamata al metodo remoto loginOperatore
+            OperatoreRegistrato operatore = stub.loginOperatore(email, password);
+
+            // Verifica se il login è riuscito
+            if (operatore != null && operatore.getId() > 0) {
+                statusLabel.setText("Login riuscito! Benvenuto " + operatore.getId());
+                JOptionPane.showMessageDialog(this, "Login avvenuto con successo! Benvenuto, " + operatore.getId());
+                // Esegui altre operazioni dopo il login...
+            } else {
+                statusLabel.setText("Credenziali non valide.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Errore di connessione.");
+        }
+    }
+
        buttback.addActionListener(new ActionListener() {
            @Override
            public void actionPerformed(ActionEvent e) {
@@ -82,7 +105,9 @@ public class AccessoFrame extends JFrame {
 
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         AccessoFrame ac = new AccessoFrame();
     }
+}
+*/
 }

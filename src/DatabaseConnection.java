@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DatabaseConnection {
@@ -78,7 +79,7 @@ public class DatabaseConnection {
                     if (generatedKeys.next()) {
                         int operatoreId = generatedKeys.getInt(1);
                         System.out.println("Operatore registrato con successo! ID: " + operatoreId);
-                         op= new OperatoreRegistrato(operatoreId,centroMonitoraggio_id);
+                         op= new OperatoreRegistrato(operatoreId,centroMonitoraggio_id,userid);
                         return op;
 
                     }
@@ -94,48 +95,33 @@ public class DatabaseConnection {
         return new OperatoreRegistrato(-1);
     }
 
-//metodo per verificare se un area di interesse inserita nei centri monitoraggio esiste
-    private boolean areeInteresseExist(String [] elencoaree){
-        boolean esiste;
-        for (int i=0;i< elencoaree.length;i++ ) {
-            esiste = areaSpecificaExists(elencoaree[i]);
-            if (esiste == false) {
 
-                return false ;
-            };
+    //metodo per ottenere il nome di un centro dato l'id
 
-        }
-        return true;
-    }
+    public String ottieniNomeCentro(Integer id){
+        if(id != null) {
+            String sql = "SELECT * FROM CentriMonitoraggio WHERE id = ?";
+            try (Connection conn = connect();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-    private boolean areaSpecificaExists(String area){
-        String sql= "SELECT COUNT(*) FROM CoordinateMonitoraggio WHERE denominazione_ufficiale ILIKE ?";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, id);
+                ResultSet rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    return rs.getString("nome");
 
-            pstmt.setString(1, area);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                boolean areaesiste= rs.getInt(1) > 0;
-                if (areaesiste) {
-                    return true;
-                }
-                else
-                    System.err.println("area: " + area + " non esistente , provvedi eventualmente a registrare l'area con le sue coordinate ");
-                return false;
+                } else
+                    System.err.println("id di un centro: " + id + " non esistente  ");
+                return null;
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
         }
-        return false;
-
-
-
-
-
+        return null;
     }
+
+
     //metodo per verificare se l'operatore esiste nel database
     private boolean operatoreExists(int operatore_id){
         String sql= "SELECT COUNT(*) FROM OperatoriRegistrati WHERE id=?";
@@ -206,10 +192,10 @@ public class DatabaseConnection {
                     int id = rs.getInt("id");
                     Integer centro_monitoraggio_id = (Integer) rs.getObject("centro_monitoraggio_id");
 
-                    System.out.println("Login effettuato con successo per l'operatore con ID: " + id +
-                            ", Centro Monitoraggio ID: " + (centro_monitoraggio_id != null ? centro_monitoraggio_id : "Non assegnato"));
+                    System.out.println("Login effettuato con successo per l'operatore: " + userid + " con ID: " + id +
+                            ", Centro Monitoraggio ID: " + (centro_monitoraggio_id != null ? centro_monitoraggio_id : "non assegnato ( di tipo null "));
 
-                    return new OperatoreRegistrato(id, centro_monitoraggio_id);
+                    return new OperatoreRegistrato(id, centro_monitoraggio_id,userid);
                 } else {
                     System.err.println("Login fallito: userid o password errati.");
                     return new OperatoreRegistrato(-1);
@@ -222,85 +208,38 @@ public class DatabaseConnection {
             return new OperatoreRegistrato(-2);
         }
     }
-    /* Metodo per creare un nuovo centro di monitoraggio associato a un operatore
 
-    N.B: è richiesto l'id dell'operatore per favorire l'aggiornamento dei dati della tabella operatoriregistrati (campo centro_monitoraggio_id)
-    *
-     */
 
-    /*
-    public int createCentroMonitoraggio(String nome, String indirizzo, String[] elencoAreeInteresse, int idOperatore) {
-        String sql = "INSERT INTO CentriMonitoraggio (nome, indirizzo, elenco_aree_interesse) VALUES (?, ?, ? )";
-        boolean esisteoperatore=operatoreExists(idOperatore);
-       //controlla che l'id inserito corrisponda ad un operatore registrato nel databse
-        if(!esisteoperatore){
-            System.out.println("operatore " + idOperatore + " non esiste");
-            return  -2;
-        }
-        boolean esistearea=areeInteresseExist(elencoAreeInteresse);
-        if(!esistearea){
-            System.out.println("sono state inserite aree non registrate");
-            return -3;
-        }
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+    public synchronized int createCentroMonitoraggio(String nome, String indirizzo , String cap , String numero_civico , String provincia ,String stato ,  int operatoreid) {
+        String sql = "INSERT INTO CentriMonitoraggio (nome, indirizzo , cap , numero_civico , provincia , stato ) VALUES (?, ?, ? , ? , ? , ?)";
 
-            pstmt.setString(1, nome);
-            pstmt.setString(2, indirizzo);
-            Array elencoAreeArray = conn.createArrayOf("TEXT", elencoAreeInteresse);
-            pstmt.setArray(3, elencoAreeArray);
-        //    N.B: il quarto argomento del metodo è necessario per aggiornare l'operatore con un riferimento al centro di monitoraggio che lui stesse sta creando
 
-            pstmt.executeUpdate();
-            System.out.println("Centro di monitoraggio creato con successo!");
-
-            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    int centroId = generatedKeys.getInt(1);
-                    System.out.println("ID del centro di monitoraggio generato: " + centroId + " , memorizzalo , ti servirà in seguito per eventuali operazioni ");
-                    updateOperatoreCentro(idOperatore, centroId);
-                    updateAreaInteresseCentro(elencoAreeInteresse,centroId);
-                    return centroId;
-                }
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Errore nella creazione del centro di monitoraggio: " + e.getMessage());  e.printStackTrace();
-            return -1; //errore di connessione
-        }
-        return -1; //errore generale
-    }
-*/
-
-    public synchronized int createCentroMonitoraggio(String nome, String indirizzo, String[] elencoAreeInteresse, int idOperatore) {
-        String sql = "INSERT INTO CentriMonitoraggio (nome, indirizzo, elenco_aree_interesse) VALUES (?, ?, ?)";
-
-        // controlla se l'operatore inserito esiste
-        boolean esisteOperatore = operatoreExists(idOperatore);
-        if (!esisteOperatore) {
-            System.out.println("Errore: l'operatore con ID " + idOperatore + " non esiste");
-            return -2;
-        }
-
+         /*
         //controlla se tutte le aree esistono
         boolean esisteArea = areeInteresseExist(elencoAreeInteresse);
         if (!esisteArea) {
             System.out.println("Errore: sono state inserite aree non registrate");
             return -3; //errore codice 3 , l'utente inserisce un area da rilevare non esistente nel database delle area registrate
         }
-        /*
-       if(nome==null || indirizzo==null ){
-           System.err.println("i campi nome , indirizzo ed aree interesse non possono essere vuoti");
-           return -4; //errore codice 4 , l'utente ha inserito valori nulli per campi di tipo not null
+        */
 
-       } */
+
+       if(nome==null || indirizzo==null || cap==null || numero_civico==null || provincia==null || stato == null){
+           System.err.println("i campi non possono essere vuoti");
+           return -1; //errore codice 1, l'utente ha inserito valori nulli per campi di tipo not null
+
+       }
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, nome);
             pstmt.setString(2, indirizzo);
-            Array elencoAreeArray = conn.createArrayOf("TEXT", elencoAreeInteresse);
-            pstmt.setArray(3, elencoAreeArray);
+            pstmt.setString(3, cap);
+            pstmt.setString(4 , numero_civico);
+            pstmt.setString(5, provincia);
+            pstmt.setString(6, stato);
+         /*   Array elencoAreeArray = conn.createArrayOf("TEXT", elencoAreeInteresse);
+            pstmt.setArray(7,elencoAreeArray); */
 
             pstmt.executeUpdate();
             System.out.println("Centro di monitoraggio creato con successo!");
@@ -309,9 +248,10 @@ public class DatabaseConnection {
                 if (generatedKeys.next()) {
                     int centroId = generatedKeys.getInt(1);
                     System.out.println("ID del centro di monitoraggio generato: " + centroId + " , memorizzalo, ti servirà in seguito per eventuali operazioni");
-                    updateOperatoreCentro(idOperatore, centroId);
-                    updateAreaInteresseCentro(elencoAreeInteresse, centroId);
-                    op.setCentroMonitoraggioId(centroId);
+                    //idoperatore fornito dallo stesso client
+                    updateOperatoreCentro(operatoreid, centroId);
+                    //updateAreaInteresseCentro(elencoAreeInteresse, centroId);
+                   // op.setCentroMonitoraggioId(centroId);
                     return centroId;
                 }
             }
@@ -319,14 +259,14 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             if (e.getSQLState().equals("23505")) { // PostgreSQL unique violation error code
                 System.out.println("Errore: Un centro di monitoraggio con questo indirizzo esiste già.");
-                return -5; // errore causato dal vincolo unique : indirizzo del centro inserito esiste già
+                return -2; // errore causato dal vincolo unique : indirizzo del centro inserito esiste già
             } else {
                 System.out.println("Errore durante la creazione del centro di monitoraggio: " + e.getMessage());
                 e.printStackTrace();
-                return -1; // General error
+                return -3; // General error
             }
         }
-        return -1; // Should not reach here, but included for completeness
+        return -3; // Should not reach here, but included for completeness
     }
     //
 
@@ -347,32 +287,6 @@ public class DatabaseConnection {
             e.printStackTrace();
         }
     }
-//aggiorna le aree di interesse con il riferimento al centro di monitoraggio che visionerà quella specifica area -> implica che un'area sia monitorata da un e un solo centro
-    public void updateAreaInteresseCentro(String [] elencoaree, int centroId ) {
-
-       for(int i=0; i< elencoaree.length; i++){
-           String sql= "UPDATE CoordinateMonitoraggio SET centro_riferimento_id = ? WHERE denominazione_ufficiale = ? " ;
-           try (Connection conn = connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-               pstmt.setInt(1, centroId);
-               pstmt.setString(2, elencoaree[i]);
-
-               pstmt.executeUpdate();
-               System.out.println("Area: " + elencoaree[i] + " aggiornato con il centro di monitoraggio di referenza!");
-
-           } catch (SQLException e) {
-               e.printStackTrace();
-           }
-
-
-       }
-
-
-
-
-
-    }
     // Metodo per inserire i parametri climatici inclusa la massa dei ghiacciai: nota bene i parametri di tipo float non possono avere piu di 3 cifre prima della virgola
     public synchronized int insertParametriClimatici(int centroMonitoraggio_id, String denominazione_ufficiale_area, int operatore_id, String dataRilevazione,
                                          float velocitaVento, int scoreVento, String notaVento,
@@ -386,7 +300,7 @@ public class DatabaseConnection {
         int coordinate_monitoraggio_id = get_id_denominazione_area(denominazione_ufficiale_area);
 //assicuriamoci che l'utente inserisca un ' area esistente in coordinate monitoraggio
         if (coordinate_monitoraggio_id == -1) {
-            System.err.println("Errore: denominazione ufficiale '" + denominazione_ufficiale_area + "' non trovata.");
+            System.err.println("Errore: denominazione ufficiale area '" + denominazione_ufficiale_area + "' non trovata.");
             return -1;
         }
 //assicuriamoci che l'id del centro di monitoraggio esista :
@@ -486,7 +400,7 @@ public class DatabaseConnection {
     //metodo per ottenere l'id della denominazione_ufficiale dell'area , metodo svolto a semplificare l'attività di inserimento di parametri climatici , l'operatore non è cosi costretto a ricordare l'd di ogni area di interesse
     public int get_id_denominazione_area(String denominazione_ufficiale_area) {
         int risultato = -1;
-        String sql = "SELECT id FROM coordinatemonitoraggio WHERE denominazione_ufficiale = ?";
+        String sql = "SELECT id FROM areeinteresse WHERE denominazione_ufficiale = ?";
 
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -531,9 +445,9 @@ public class DatabaseConnection {
     }
 
 
-    public synchronized int insertCoordinateMonitoraggio(float latitudine, float longitudine,
-                                            String denominazioneUfficiale, String stato) {
-        String sql = "INSERT INTO CoordinateMonitoraggio (latitudine, longitudine, denominazione_ufficiale, stato) " +
+    public synchronized int insertAreeInteresse(float latitudine, float longitudine,
+                                            String denominazioneUfficiale, String stato,int centro_monitoraggio_id) {
+        String sql = "INSERT INTO AreeInteresse (latitudine, longitudine, denominazione_ufficiale, stato) " +
                 "VALUES (?, ?, ?, ?)";
 
         if( denominazioneUfficiale==null || stato==null){
@@ -553,25 +467,63 @@ public class DatabaseConnection {
 
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    int coordinatemonitoraggio_id = generatedKeys.getInt(1);
-                    System.out.println("ID delle coordinate di monitoraggio generato: " + coordinatemonitoraggio_id);
-                    return coordinatemonitoraggio_id;
+                    int areainteresseid = generatedKeys.getInt(1);
+                    System.out.println("ID dell'area di interesse generato: " + areainteresseid);
+                   int risposta= insertAreeControllate(centro_monitoraggio_id,areainteresseid );
+                   if(risposta > 0) {
+                       System.out.println("aggiorno il db areecontrollate " + "id : " + risposta + " unione di : " + centro_monitoraggio_id + " e " + areainteresseid);
+                   }
+                   else {
+                       System.out.println("problema di connessione , associazione centro e area fallita");
+                   }
+                    return areainteresseid;
                 }
             }
         } catch (SQLException e) {
             if (e.getSQLState().equals("23505")) { // PostgreSQL unique violation error code : vincolo unique su denominazione ufficiale
                 System.err.println("Errore: Coordinate di monitoraggio già esistenti per questa denominazione ufficiale ");
+                return -3;
             } else {
                 System.err.println("Errore nell'inserimento delle coordinate di monitoraggio: " + e.getMessage());
+
             }
             e.printStackTrace();
+            return -1; //errore di connesione
         }
-        return -1; // Indicates failure: non è rispettato il vincolo unique
+        return -1; // Indicates failure
     }
+
+    public synchronized int insertAreeControllate(int centroId, int areaId) {
+        String sql = "INSERT INTO AreeControllate (centro_id, area_id) VALUES (?, ?)";
+
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, centroId);
+            pstmt.setInt(2, areaId);
+
+            pstmt.executeUpdate();
+            System.out.println("Associazione tra centro di monitoraggio e area di interesse inserita con successo!");
+            return 1;
+
+        } catch (SQLException e) {
+            // Controlla se l'errore è dovuto a una violazione del vincolo UNIQUE
+            if (e.getSQLState().equals("23505")) { // SQL state 23505 è per la violazione UNIQUE (verifica sul tuo database)
+                System.err.println("Violazione del vincolo UNIQUE: " + e.getMessage());
+                return -2;
+            } else {
+                System.err.println("Errore durante l'inserimento dei dati in AreeControllate: " + e.getMessage());
+                e.printStackTrace();
+                return -1;
+            }
+        }
+    }
+
+
 
     public synchronized List<AreaGeografica> cercaAreaGeograficaPerDenominazione(String denominazione_ufficiale) {
         List<AreaGeografica> risultati = new ArrayList<>();
-        String sql = "SELECT * FROM CoordinateMonitoraggio WHERE denominazione_ufficiale ILIKE ? ";
+        String sql = "SELECT * FROM areeinteresse WHERE denominazione_ufficiale ILIKE ? ";
 
         try {
             Connection conn = connect();
@@ -599,7 +551,7 @@ return risultati;
 
     public synchronized List<AreaGeografica> cercaAreaGeograficaPerStato(String stato) {
         List<AreaGeografica> risultati = new ArrayList<>();
-        String sql = "SELECT * FROM CoordinateMonitoraggio WHERE stato ILIKE ?";
+        String sql = "SELECT * FROM areeinteresse WHERE stato ILIKE ?";
 
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -636,7 +588,7 @@ return risultati;
         List<AreaGeografica> risultati = new ArrayList<>();
         //serve a selezionare la riga dalla tabella CoordinateMonitoraggio con le coordinate più vicine a un punto specifico
         String sql = "SELECT * " +
-                "FROM CoordinateMonitoraggio " +
+                "FROM areeinteresse " +
                 "ORDER BY (latitudine - ?)^2 + (longitudine - ?)^2 " +
                 "LIMIT 1";  //Limita il numero di righe restituite dalla query a 1
 //ORDER BY (latitudine - ?)^2 + (longitudine - ?)^2 ordina i risultati in base a questa distanza quadratica, dalla più vicina alla più lontana
@@ -683,20 +635,20 @@ return risultati;
 
         String sql = "SELECT " +
                 "STRING_AGG(TO_CHAR(data_rilevazione, 'YYYY-MM-DD'), '; ') AS date_rilevazioni, " +
-                "AVG(velocita_vento) AS media_velocita_vento, AVG(score_vento) AS score_medio_vento , COUNT(velocita_vento) AS num_vento, STRING_AGG(nota_vento, '; ') AS note_vento, " +
-                "AVG(umidita) AS media_umidita, AVG(score_umidita) AS score_medio_umidita , COUNT(umidita) AS num_umidita, STRING_AGG(nota_umidita, '; ') AS note_umidita, " +
-                "AVG(pressione) AS media_pressione, AVG(score_pressione) AS score_medio_pressione , COUNT(pressione) AS num_pressione, STRING_AGG(nota_pressione, '; ') AS note_pressione, " +
-                "AVG(temperatura) AS media_temperatura, AVG(score_temperatura) AS score_medio_temperatura , COUNT(temperatura) AS num_temperatura, STRING_AGG(nota_temperatura, '; ') AS note_temperatura, " +
-                "AVG(precipitazioni) AS media_precipitazioni, AVG(score_precipitazioni) AS score_medio_precipitazioni , COUNT(precipitazioni) AS num_precipitazioni, STRING_AGG(nota_precipitazioni, '; ') AS note_precipitazioni, " +
-                "AVG(altitudine_ghiacciai) AS media_altitudine_ghiacciai, AVG(score_altitudine_ghiacciai) AS score_medio_altitudine_ghiacciai , COUNT(altitudine_ghiacciai) AS num_altitudine_ghiacciai, STRING_AGG(nota_altitudine_ghiacciai, '; ') AS note_altitudine_ghiacciai, " +
-                "AVG(massa_ghiacciai) AS media_massa_ghiacciai, AVG(score_massa_ghiacciai) AS score_medio_massa_ghiacciai , COUNT(massa_ghiacciai) AS num_massa_ghiacciai, STRING_AGG(nota_massa_ghiacciai, '; ') AS note_massa_ghiacciai " +
+                "AVG(velocita_vento) AS media_velocita_vento, AVG(score_vento) AS score_medio_vento , COUNT(velocita_vento) AS num_vento, " +
+                "AVG(umidita) AS media_umidita, AVG(score_umidita) AS score_medio_umidita , COUNT(umidita) AS num_umidita, " +
+                "AVG(pressione) AS media_pressione, AVG(score_pressione) AS score_medio_pressione , COUNT(pressione) AS num_pressione, " +
+                "AVG(temperatura) AS media_temperatura, AVG(score_temperatura) AS score_medio_temperatura , COUNT(temperatura) AS num_temperatura, " +
+                "AVG(precipitazioni) AS media_precipitazioni, AVG(score_precipitazioni) AS score_medio_precipitazioni , COUNT(precipitazioni) AS num_precipitazioni, " +
+                "AVG(altitudine_ghiacciai) AS media_altitudine_ghiacciai, AVG(score_altitudine_ghiacciai) AS score_medio_altitudine_ghiacciai , COUNT(altitudine_ghiacciai) AS num_altitudine_ghiacciai, " +
+                "AVG(massa_ghiacciai) AS media_massa_ghiacciai, AVG(score_massa_ghiacciai) AS score_medio_massa_ghiacciai , COUNT(massa_ghiacciai) AS num_massa_ghiacciai  " +
                 "FROM ParametriClimatici WHERE coordinate_monitoraggio_id = ?";
 
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id_area_ricercata);
-
+//aggiornare
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     ParametriClimatici parametri = new ParametriClimatici(
@@ -745,68 +697,59 @@ return risultati;
     }
 
 
+    public List<String> getareeosservatedalcentro(int centromonitoraggioid) {
+        String sql = "SELECT DISTINCT ai.denominazione_ufficiale " +
+                "FROM areeinteresse ai " +
+                "JOIN areecontrollate ac ON ai.id = ac.area_id " +
+                "WHERE ac.centro_id = ?";  // Usa un placeholder per il parametro
+
+        List<String> lista = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // Usa l'indice 1 per il parametro
+            pstmt.setInt(1, centromonitoraggioid);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                String nome = rs.getString("denominazione_ufficiale");
+                lista.add(nome);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
+
+public List<String> getTutteAreeInteresse (int id){
+        String sql= "select DISTINCT denominazione_ufficiale from areeinteresse where id > ? ";
+        List<String> lista = new ArrayList<>();
+    try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setInt(1,id);
+        ResultSet rs = pstmt.executeQuery();
+        while (rs.next()) {
+            String nome = rs.getString("denominazione_ufficiale");
+            lista.add(nome);
+            Collections.sort(lista);
+
+        }
+        return lista;
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return null;
+    }
+}
+
+
+
+
     public static void main(String[] args) {
         DatabaseConnection dc = new DatabaseConnection();
-        List<ParametriClimatici> risultati2 = dc.visualizzaDatiClimatici("Posillipo");
-        for (ParametriClimatici pc : risultati2){
-            System.out.println(pc.toString());
-        }
-        List<ParametriClimatici> risultati3 = dc.visualizzaDatiClimatici("posillipo");
-        for (ParametriClimatici pc : risultati3){
-            System.out.println( "secondo test , np lettera minuscola "  +  pc.toString());
-        }
-        List<ParametriClimatici> risultati4 = dc.visualizzaDatiClimatici("canegrate");
-        for (ParametriClimatici pc : risultati4){
-            System.out.println("controllo area non esistente " + pc.toString());
-        }
-
-        List<AreaGeografica> ricercaperarea = dc.cercaAreaGeograficaPerDenominazione("Posillipo");
-        for (AreaGeografica aa : ricercaperarea){
-            System.out.println("ricerca corretta per denominazione" + aa.toString());
-        }
-        List<AreaGeografica> ricercaperarea2 = dc.cercaAreaGeograficaPerDenominazione("Posilliopo");
-        for (AreaGeografica ab : ricercaperarea2){
-            System.out.println("ricerca erratA per denominazione" + ab.toString());
-        }
-
-        List<AreaGeografica> risultati = dc.cercaAreaGeograficaPerStato("Italia");
-        for(AreaGeografica ag : risultati){
-            System.out.println(ag.toString());
-
-        }
-
-        dc.cercaAreaGeograficaPerStato("debe");
-
-        dc.cercaPerCoordinate(231,2);
-        // Test di inserimento parametri climatici
-        System.out.println("Test di inserimento parametri climatici:");
-
-        // Assumiamo che questi ID esistano nel database
-        int centroMonitoraggioId = 1;
-        String denominazioneUfficialeArea = "Area Test";
-        int operatoreId = 1;
-
-        // Chiamata al metodo di inserimento
-        int result = dc.insertParametriClimatici(
-                centroMonitoraggioId,
-                denominazioneUfficialeArea,
-                operatoreId,
-                null,  // data rilevazione omessa
-                10.5f, 3, "Vento moderato",
-                60.0f, 2, "Umidità nella norma",
-                1013.25f, 1, "Pressione atmosferica standard",
-                22.5f, 2, "Temperatura mite",
-                5.0f, 1, "Leggera pioggia",
-                3000.0f, 2, "Altitudine ghiacciai nella media",
-                1000000.0f, 3, "Massa ghiacciai in diminuzione"
-        );
-
-        // Verifica del risultato
-        if (result == 1) {
-            System.out.println("Inserimento parametri climatici riuscito.");
-        } else {
-            System.out.println("Errore nell'inserimento dei parametri climatici. Codice errore: " + result);
-        }
+      //  dc.createOperatoreRegistrato("luca","marani ", "23", "rr@", "dtdt" ,"4wrwwr",null);
 /*
 nel client e/o nel serve vanno implementati dei controlli sui parametri inseriti dall'utente che controllino
  che quest'ultimi non siano null ,
@@ -819,7 +762,16 @@ dei valori stringhe laddove èrichiesto un valore di tipo int
 
 
  */
-    }
+
+
+        List<String> lista = dc.getTutteAreeInteresse(0);
+            for(String a : lista){
+
+                System.out.println(a);
+            }
+        }
+
+
 
 
 }

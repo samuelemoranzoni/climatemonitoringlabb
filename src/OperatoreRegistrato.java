@@ -5,6 +5,8 @@ public class OperatoreRegistrato implements Serializable {
     int id;
     Integer centroMonitoraggioId;
 
+    String userid;
+
     public int getId() {
         return id;
     }
@@ -13,6 +15,13 @@ public class OperatoreRegistrato implements Serializable {
         this.id = id;
     }
 
+    public void setUserId(String userid){
+        this.userid=userid;
+    }
+public String getUserId() {
+     return userid;
+
+}
     public Integer getCentroMonitoraggioId() {
         return centroMonitoraggioId;
     }
@@ -26,8 +35,9 @@ OperatoreRegistrato(int id){
 
 
 }
-    OperatoreRegistrato(int id, Integer idcentromonitoraggio){
+    OperatoreRegistrato(int id, Integer idcentromonitoraggio , String userId){
         this.id=id;
         this.centroMonitoraggioId=idcentromonitoraggio;
+        this.userid=userId;
     }
 }
