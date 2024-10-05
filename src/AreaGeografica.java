@@ -1,4 +1,7 @@
-public class AreaGeografica {
+import java.io.Serializable;
+
+public class AreaGeografica implements Serializable {
+    private static final long serialVersionUID = 1;
     public String denominazione;
     public String stato;
     public double latitudine;
@@ -13,12 +16,11 @@ public class AreaGeografica {
 
     @Override
     public String toString() {
-        return "AreaGeografica {" +
-                "denominazione='" + denominazione + '\'' +
+        return
+                "Denominazione='" + denominazione + '\'' +
                 ", stato='" + stato + '\'' +
                 ", latitudine=" + latitudine +
-                ", longitudine=" + longitudine +
-                " }";
+                ", longitudine=" + longitudine ;
     }
 
     public void setDenominazione(String denominazione) {

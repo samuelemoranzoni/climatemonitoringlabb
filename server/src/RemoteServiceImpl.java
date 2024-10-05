@@ -12,6 +12,16 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
     }
 
     @Override
+    public Integer get_id_centro(String nome) throws RemoteException {
+        return database.get_id_centro(nome);
+    }
+
+    @Override
+    public List<String> getCentriRegistrati(int id) throws RemoteException {
+        return database.getCentriRegistrati(0);
+    }
+
+    @Override
     public int get_id_denominazione_area(String denominazione_ufficiale_area) throws RemoteException {
         return database.get_id_denominazione_area(denominazione_ufficiale_area);
     }
@@ -37,14 +47,11 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
     }
 
     @Override
-    public List<AreaGeografica> cercaAreaGeograficaPerDenominazione(String nomeArea) throws RemoteException {
-        return database.cercaAreaGeograficaPerDenominazione(nomeArea);
+    public List<AreaGeografica> cercaAreaGeograficaPerDenominazioneeStato(String nomeArea, String nomeStato) throws RemoteException {
+        return database.cercaAreaGeograficaPerDenominazioneeStato(nomeArea, nomeStato);
     }
 
-    @Override
-    public List<AreaGeografica> cercaAreaGeograficaPerStato(String stato) throws RemoteException {
-        return database.cercaAreaGeograficaPerStato(stato);
-    }
+
 
     @Override
     public List<AreaGeografica> cercaPerCoordinate(double latitudine, double longitudine) throws RemoteException {
@@ -52,7 +59,7 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
     }
 
     @Override
-    public List<ParametriClimatici> visualizzaDatiClimatici(String area) throws RemoteException {
+    public ParametriClimatici visualizzaDatiClimatici(String area) throws RemoteException {
         return database.visualizzaDatiClimatici(area);
     }
 

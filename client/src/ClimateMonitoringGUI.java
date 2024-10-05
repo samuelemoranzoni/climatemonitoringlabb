@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.net.URL;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 public class ClimateMonitoringGUI extends JFrame {
     private Image backgroundImage;
@@ -57,7 +59,13 @@ public class ClimateMonitoringGUI extends JFrame {
         // Add action listeners
         searchButton.addActionListener(e -> {
 
-            new RicercaVisualizzazioneFrame().setVisible(true);
+            try {
+                new RicercaAreaGeograficaFrame().setVisible(true);
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            } catch (NotBoundException ex) {
+                throw new RuntimeException(ex);
+            }
             setVisible(false);
         });
 

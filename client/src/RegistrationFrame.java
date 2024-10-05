@@ -5,18 +5,26 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.List;
 
 public class RegistrationFrame extends JFrame {
-    private JTextField nomeField, cognomeField, codiceFiscaleField, emailField, usernameField, idMonitoraggioField;
+    private JTextField nomeField, cognomeField, codiceFiscaleField, emailField, usernameField;
     private JPasswordField passwordField;
+    private JComboBox<String> idMonitoraggioComboBox;
     JFrame previousframe;
+    private RemoteService stub;
 
-    public RegistrationFrame(JFrame frame) throws IOException {
+
+
+    public RegistrationFrame(JFrame frame) throws IOException, NotBoundException {
         this.previousframe = frame;
         setTitle("Registrazione Operatore");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+//accesso tramite rmi
+        Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+         stub = (RemoteService) registry.lookup("RemoteService");
 
         // Main panel with gradient background
         JPanel mainPanel = new JPanel(new GridBagLayout()) {
@@ -52,16 +60,15 @@ public class RegistrationFrame extends JFrame {
         formGbc.insets = new Insets(5, 5, 5, 5);
         formGbc.anchor = GridBagConstraints.WEST;
 
-        // Create form fields
         String[] labels = {"Nome:*", "Cognome:*", "Codice Fiscale:*", "Email:*", "Username:*", "Password:*", "ID Monitoraggio:"};
-        JTextField[] fields = {
+        JComponent[] fields = {
                 nomeField = createStyledTextField(),
                 cognomeField = createStyledTextField(),
                 codiceFiscaleField = createStyledTextField(),
                 emailField = createStyledTextField(),
                 usernameField = createStyledTextField(),
                 passwordField = createStyledPasswordField(),
-                idMonitoraggioField = createStyledTextField()
+                idMonitoraggioComboBox = createStyledComboBox()
         };
 
         // Add form fields
@@ -76,6 +83,8 @@ public class RegistrationFrame extends JFrame {
             formGbc.fill = GridBagConstraints.HORIZONTAL;
             formPanel.add(fields[i], formGbc);
         }
+
+
 
         gbc.gridy = 1;
         mainPanel.add(formPanel, gbc);
@@ -126,6 +135,26 @@ public class RegistrationFrame extends JFrame {
         field.setPreferredSize(new Dimension(250, 30));
         return field;
     }
+    // New method to create styled ComboBox
+    private JComboBox<String> createStyledComboBox() {
+        JComboBox<String> comboBox = new JComboBox<>();
+        comboBox.setFont(new Font("Arial", Font.PLAIN, 14));
+        comboBox.setPreferredSize(new Dimension(250, 30));
+        try {
+            comboBox.addItem("Nessun centro"); //prima opzione
+            List<String> centri = stub.getCentriRegistrati(0);
+            for(String centro : centri){
+                comboBox.addItem(centro);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Errore nel caricamento delle aree: " + ex.getMessage(),
+                    "Errore",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        return comboBox;
+    }
 
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
@@ -163,17 +192,19 @@ public class RegistrationFrame extends JFrame {
         }
 
         try {
-            Integer idMonitoraggio = idMonitoraggioField.getText().isEmpty() ?
-                    null : Integer.valueOf(idMonitoraggioField.getText());
+            String selectedCentroMonitoraggio = (String) idMonitoraggioComboBox.getSelectedItem();
 
-            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-            RemoteService stub = (RemoteService) registry.lookup("RemoteService");
+            if (selectedCentroMonitoraggio.equals("Nessun centro")) {
+                selectedCentroMonitoraggio = null;
+            }
+        /*    Integer idMonitoraggio = (selectedCentroMonitoraggio != null && !selectedCentroMonitoraggio.isEmpty()) ?
+                    Integer.valueOf(selectedCentroMonitoraggio) : null;  */
 
             OperatoreRegistrato or = stub.createOperatoreRegistrato(
                     nomeField.getText(), cognomeField.getText(),
                     codiceFiscaleField.getText(), emailField.getText(),
                     usernameField.getText(), new String(passwordField.getPassword()),
-                    idMonitoraggio);
+                    stub.get_id_centro(selectedCentroMonitoraggio));
 
             handleRegistrationResponse(or.getId());
         } catch (NumberFormatException e) {
@@ -218,7 +249,7 @@ public class RegistrationFrame extends JFrame {
         SwingUtilities.invokeLater(() -> {
             try {
                 new RegistrationFrame(new Menuoperatorareaframe(new ClimateMonitoringGUI())).setVisible(true);
-            } catch (IOException e) {
+            } catch (IOException | NotBoundException e) {
                 e.printStackTrace();
             }
         });

@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.TextAttribute;
 import java.io.IOException;
+import java.rmi.NotBoundException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.HashMap;
@@ -180,6 +181,8 @@ public class ClientLoginGUI extends JFrame {
                 new RegistrationFrame(this).setVisible(true);
                 dispose();
             } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (NotBoundException e) {
                 throw new RuntimeException(e);
             }
         });

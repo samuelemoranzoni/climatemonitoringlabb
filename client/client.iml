@@ -19,6 +19,17 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="Progettob" />
+    <orderEntry type="module" module-name="Progettob" exported="" />
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/Downloads/jfreechart-1.5.2.zip!/jfreechart-1.5.2/src/main/java" />
+          <root url="jar://$USER_HOME$/Downloads/jfreechart-1.5.2.zip!/jfreechart-1.5.2/src/test/java" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module" module-name="server" />
   </component>
 </module>

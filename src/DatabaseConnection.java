@@ -8,7 +8,8 @@ public class DatabaseConnection {
     private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
     private static final String USER = "postgres";
     private static final String PASSWORD = "labb18";
-    private  static OperatoreRegistrato op;
+    private static OperatoreRegistrato op;
+
     public static Connection connect() {
         Connection conn = null;
         try {
@@ -79,7 +80,7 @@ public class DatabaseConnection {
                     if (generatedKeys.next()) {
                         int operatoreId = generatedKeys.getInt(1);
                         System.out.println("Operatore registrato con successo! ID: " + operatoreId);
-                         op= new OperatoreRegistrato(operatoreId,centroMonitoraggio_id,userid);
+                        op = new OperatoreRegistrato(operatoreId, centroMonitoraggio_id, userid);
                         return op;
 
                     }
@@ -96,10 +97,35 @@ public class DatabaseConnection {
     }
 
 
+    public Integer get_id_centro(String nome) {
+        if(nome==null){
+            return null;
+        }
+        String sql = "select id from centrimonitoraggio where nome ILIKE ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, nome);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+
+            } else
+                System.err.println("errore nel reperire l'id del centro");
+            return null;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+
     //metodo per ottenere il nome di un centro dato l'id
 
-    public String ottieniNomeCentro(Integer id){
-        if(id != null) {
+    public String ottieniNomeCentro(Integer id) {
+        if (id != null) {
             String sql = "SELECT * FROM CentriMonitoraggio WHERE id = ?";
             try (Connection conn = connect();
                  PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -123,8 +149,8 @@ public class DatabaseConnection {
 
 
     //metodo per verificare se l'operatore esiste nel database
-    private boolean operatoreExists(int operatore_id){
-        String sql= "SELECT COUNT(*) FROM OperatoriRegistrati WHERE id=?";
+    private boolean operatoreExists(int operatore_id) {
+        String sql = "SELECT COUNT(*) FROM OperatoriRegistrati WHERE id=?";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -141,6 +167,7 @@ public class DatabaseConnection {
 
 
     }
+
     // Metodo per verificare se un centro di monitoraggio esiste
     private boolean centroMonitoraggioExists(int centroMonitoraggio_id) {
         String sql = "SELECT COUNT(*) FROM CentriMonitoraggio WHERE id = ?";
@@ -159,6 +186,7 @@ public class DatabaseConnection {
         }
         return false;
     }
+
     //controlla che non siano inseriti campi user_id o codice fiscali gia presenti : sono campi unique!
     private boolean recordExists(String codiceFiscale, String userid) {
         String sql = "SELECT COUNT(*) FROM OperatoriRegistrati WHERE codice_fiscale ILIKE ? OR userid ILIKE ?";
@@ -195,7 +223,7 @@ public class DatabaseConnection {
                     System.out.println("Login effettuato con successo per l'operatore: " + userid + " con ID: " + id +
                             ", Centro Monitoraggio ID: " + (centro_monitoraggio_id != null ? centro_monitoraggio_id : "non assegnato ( di tipo null "));
 
-                    return new OperatoreRegistrato(id, centro_monitoraggio_id,userid);
+                    return new OperatoreRegistrato(id, centro_monitoraggio_id, userid);
                 } else {
                     System.err.println("Login fallito: userid o password errati.");
                     return new OperatoreRegistrato(-1);
@@ -210,7 +238,7 @@ public class DatabaseConnection {
     }
 
 
-    public synchronized int createCentroMonitoraggio(String nome, String indirizzo , String cap , String numero_civico , String provincia ,String stato ,  int operatoreid) {
+    public synchronized int createCentroMonitoraggio(String nome, String indirizzo, String cap, String numero_civico, String provincia, String stato, int operatoreid) {
         String sql = "INSERT INTO CentriMonitoraggio (nome, indirizzo , cap , numero_civico , provincia , stato ) VALUES (?, ?, ? , ? , ? , ?)";
 
 
@@ -224,18 +252,18 @@ public class DatabaseConnection {
         */
 
 
-       if(nome==null || indirizzo==null || cap==null || numero_civico==null || provincia==null || stato == null){
-           System.err.println("i campi non possono essere vuoti");
-           return -1; //errore codice 1, l'utente ha inserito valori nulli per campi di tipo not null
+        if (nome == null || indirizzo == null || cap == null || numero_civico == null || provincia == null || stato == null) {
+            System.err.println("i campi non possono essere vuoti");
+            return -1; //errore codice 1, l'utente ha inserito valori nulli per campi di tipo not null
 
-       }
+        }
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, nome);
             pstmt.setString(2, indirizzo);
             pstmt.setString(3, cap);
-            pstmt.setString(4 , numero_civico);
+            pstmt.setString(4, numero_civico);
             pstmt.setString(5, provincia);
             pstmt.setString(6, stato);
          /*   Array elencoAreeArray = conn.createArrayOf("TEXT", elencoAreeInteresse);
@@ -251,7 +279,7 @@ public class DatabaseConnection {
                     //idoperatore fornito dallo stesso client
                     updateOperatoreCentro(operatoreid, centroId);
                     //updateAreaInteresseCentro(elencoAreeInteresse, centroId);
-                   // op.setCentroMonitoraggioId(centroId);
+                    // op.setCentroMonitoraggioId(centroId);
                     return centroId;
                 }
             }
@@ -287,15 +315,16 @@ public class DatabaseConnection {
             e.printStackTrace();
         }
     }
+
     // Metodo per inserire i parametri climatici inclusa la massa dei ghiacciai: nota bene i parametri di tipo float non possono avere piu di 3 cifre prima della virgola
     public synchronized int insertParametriClimatici(int centroMonitoraggio_id, String denominazione_ufficiale_area, int operatore_id, String dataRilevazione,
-                                         float velocitaVento, int scoreVento, String notaVento,
-                                         float umidita, int scoreUmidita, String notaUmidita,
-                                         float pressione, int scorePressione, String notaPressione,
-                                         float temperatura, int scoreTemperatura, String notaTemperatura,
-                                         float precipitazioni, int scorePrecipitazioni, String notaPrecipitazioni,
-                                         float altitudineGhiacciai, int scoreAltitudineGhiacciai, String notaAltitudineGhiacciai,
-                                         float massaGhiacciai, int scoreMassaGhiacciai, String notaMassaGhiacciai) {
+                                                     float velocitaVento, int scoreVento, String notaVento,
+                                                     float umidita, int scoreUmidita, String notaUmidita,
+                                                     float pressione, int scorePressione, String notaPressione,
+                                                     float temperatura, int scoreTemperatura, String notaTemperatura,
+                                                     float precipitazioni, int scorePrecipitazioni, String notaPrecipitazioni,
+                                                     float altitudineGhiacciai, int scoreAltitudineGhiacciai, String notaAltitudineGhiacciai,
+                                                     float massaGhiacciai, int scoreMassaGhiacciai, String notaMassaGhiacciai) {
 //per praticità , l'utente deve inserire soltanto la denominazione ufficiale dell'area che monitora , delegando la ricerca dell'id di riferimento al sistema
         int coordinate_monitoraggio_id = get_id_denominazione_area(denominazione_ufficiale_area);
 //assicuriamoci che l'utente inserisca un ' area esistente in coordinate monitoraggio
@@ -304,13 +333,13 @@ public class DatabaseConnection {
             return -1;
         }
 //assicuriamoci che l'id del centro di monitoraggio esista :
-        if(!centroMonitoraggioExists(centroMonitoraggio_id)) {
+        if (!centroMonitoraggioExists(centroMonitoraggio_id)) {
             System.err.println("Errore: centro monitoraggio " + centroMonitoraggio_id + " non esiste ");
             return -2;
         }
         //assicuriamoci che l'id dell'operatore esista:
-        if (!operatoreExists(operatore_id)){
-            System.err.println("Errore: operatore " + operatore_id + " non esiste " );
+        if (!operatoreExists(operatore_id)) {
+            System.err.println("Errore: operatore " + operatore_id + " non esiste ");
             return -3;
         }
 
@@ -324,8 +353,7 @@ public class DatabaseConnection {
 
 //controllo che i valori di score siano compresi tra 1 e 5 : vincolo check
 
-        if(scoreAltitudineGhiacciai>5 || scoreAltitudineGhiacciai<1 || scoreMassaGhiacciai>5 || scoreMassaGhiacciai<1 || scorePrecipitazioni>5 || scorePrecipitazioni<1 || scorePressione>5 || scorePressione<1 || scoreTemperatura>5 || scoreTemperatura<1 || scoreUmidita>5 || scoreUmidita<1 || scoreVento>5 || scoreVento<1 )
-        {
+        if (scoreAltitudineGhiacciai > 5 || scoreAltitudineGhiacciai < 1 || scoreMassaGhiacciai > 5 || scoreMassaGhiacciai < 1 || scorePrecipitazioni > 5 || scorePrecipitazioni < 1 || scorePressione > 5 || scorePressione < 1 || scoreTemperatura > 5 || scoreTemperatura < 1 || scoreUmidita > 5 || scoreUmidita < 1 || scoreVento > 5 || scoreVento < 1) {
             System.out.println("Errore: lo score relativo ai parametri deve essere compreso tra 1 e 5 ");
             return -5;
         }
@@ -336,11 +364,10 @@ public class DatabaseConnection {
         }
 
         //consistenza dati di natura ambientale
-        if(velocitaVento <= 0 ||  pressione <= 0 ||  precipitazioni < 0 ||  massaGhiacciai <= 0){
+        if (velocitaVento <= 0 || pressione <= 0 || precipitazioni < 0 || massaGhiacciai <= 0) {
             System.err.println("Errore: tutti i parametri climatici devono essere valori positivi.");
             return -7;
         }
-
 
 
         String sql = "INSERT INTO parametriclimatici (centro_monitoraggio_id,coordinate_monitoraggio_id , operatore_id , data_rilevazione, " +
@@ -391,7 +418,8 @@ public class DatabaseConnection {
             }
 
         } catch (SQLException e) {
-            System.err.println("Errore nell'inserimento di parametri : " + e.getMessage());  e.printStackTrace();
+            System.err.println("Errore nell'inserimento di parametri : " + e.getMessage());
+            e.printStackTrace();
             return -8;
         }
 
@@ -446,11 +474,11 @@ public class DatabaseConnection {
 
 
     public synchronized int insertAreeInteresse(float latitudine, float longitudine,
-                                            String denominazioneUfficiale, String stato,int centro_monitoraggio_id) {
+                                                String denominazioneUfficiale, String stato, int centro_monitoraggio_id) {
         String sql = "INSERT INTO AreeInteresse (latitudine, longitudine, denominazione_ufficiale, stato) " +
                 "VALUES (?, ?, ?, ?)";
 
-        if( denominazioneUfficiale==null || stato==null){
+        if (denominazioneUfficiale == null || stato == null) {
             System.err.println("i campi denominazione ufficiale e stato devono essere non nulli");
             return -2;
         }
@@ -469,13 +497,12 @@ public class DatabaseConnection {
                 if (generatedKeys.next()) {
                     int areainteresseid = generatedKeys.getInt(1);
                     System.out.println("ID dell'area di interesse generato: " + areainteresseid);
-                   int risposta= insertAreeControllate(centro_monitoraggio_id,areainteresseid );
-                   if(risposta > 0) {
-                       System.out.println("aggiorno il db areecontrollate " + "id : " + risposta + " unione di : " + centro_monitoraggio_id + " e " + areainteresseid);
-                   }
-                   else {
-                       System.out.println("problema di connessione , associazione centro e area fallita");
-                   }
+                    int risposta = insertAreeControllate(centro_monitoraggio_id, areainteresseid);
+                    if (risposta > 0) {
+                        System.out.println("aggiorno il db areecontrollate " + "id : " + risposta + " unione di : " + centro_monitoraggio_id + " e " + areainteresseid);
+                    } else {
+                        System.out.println("problema di connessione , associazione centro e area fallita");
+                    }
                     return areainteresseid;
                 }
             }
@@ -520,17 +547,17 @@ public class DatabaseConnection {
     }
 
 
-
-    public synchronized List<AreaGeografica> cercaAreaGeograficaPerDenominazione(String denominazione_ufficiale) {
+    public synchronized List<AreaGeografica> cercaAreaGeograficaPerDenominazioneeStato(String denominazione_ufficiale,String stato) {
         List<AreaGeografica> risultati = new ArrayList<>();
-        String sql = "SELECT * FROM areeinteresse WHERE denominazione_ufficiale ILIKE ? ";
+        String sql = "SELECT * FROM areeinteresse WHERE denominazione_ufficiale ILIKE ? AND stato ILIKE ?";
 
         try {
             Connection conn = connect();
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, denominazione_ufficiale);
+            pstmt.setString(2,stato);
             ResultSet rs = pstmt.executeQuery();
-            String ris=null;
+            String ris = null;
             while (rs.next()) {
                 AreaGeografica area = new AreaGeografica(
                         rs.getString("denominazione_ufficiale"),
@@ -545,10 +572,10 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-return risultati;
+        return risultati;
 
     }
-
+/*
     public synchronized List<AreaGeografica> cercaAreaGeograficaPerStato(String stato) {
         List<AreaGeografica> risultati = new ArrayList<>();
         String sql = "SELECT * FROM areeinteresse WHERE stato ILIKE ?";
@@ -574,14 +601,7 @@ return risultati;
         //lista vuota se non ci sono risultati : il server o il client deveono controllare se la lista è vuota
         return risultati;
     }
-
-
-
-
-
-
-
-
+*/
 
     // Ricerca per coordinate geografiche
     public synchronized List<AreaGeografica> cercaPerCoordinate(double latitudine, double longitudine) {
@@ -589,7 +609,7 @@ return risultati;
         //serve a selezionare la riga dalla tabella CoordinateMonitoraggio con le coordinate più vicine a un punto specifico
         String sql = "SELECT * " +
                 "FROM areeinteresse " +
-                "ORDER BY (latitudine - ?)^2 + (longitudine - ?)^2 " +
+                "ORDER BY POWER(latitudine - ?, 2) + POWER(longitudine - ?, 2) " +
                 "LIMIT 1";  //Limita il numero di righe restituite dalla query a 1
 //ORDER BY (latitudine - ?)^2 + (longitudine - ?)^2 ordina i risultati in base a questa distanza quadratica, dalla più vicina alla più lontana
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -602,11 +622,11 @@ return risultati;
 
             while (rs.next()) {
 
- AreaGeografica area= new AreaGeografica
-         (rs.getString("denominazione_ufficiale"),rs.getString("stato"),
-                 rs.getDouble("latitudine"),rs.getDouble("longitudine"));
+                AreaGeografica area = new AreaGeografica
+                        (rs.getString("denominazione_ufficiale"), rs.getString("stato"),
+                                rs.getDouble("latitudine"), rs.getDouble("longitudine"));
 
-             risultati.add(area);
+                risultati.add(area);
 
             }
 
@@ -621,16 +641,14 @@ return risultati;
     // Metodo per visualizzare le informazioni climatiche di un'area di interesse
 
 
-
-
-    public synchronized List<ParametriClimatici> visualizzaDatiClimatici(String areaInteresse) {
-        List<ParametriClimatici> risultati = new ArrayList<>();
+    public synchronized ParametriClimatici visualizzaDatiClimatici(String areaInteresse) {
+       ParametriClimatici pc=null;
 
         // Verifica se l'area esiste prima di eseguire la query principale
         int id_area_ricercata = get_id_denominazione_area(areaInteresse);
         if (id_area_ricercata == -1) {
             // L'area non esiste, restituisci una lista vuota
-            return risultati;
+            return pc;
         }
 
         String sql = "SELECT " +
@@ -651,49 +669,41 @@ return risultati;
 //aggiornare
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    ParametriClimatici parametri = new ParametriClimatici(
-                            rs.getString("date_rilevazioni"),
+                   pc = new ParametriClimatici(
                             rs.getFloat("media_velocita_vento"),
                             rs.getFloat("score_medio_vento"),
                             rs.getInt("num_vento"),
-                            rs.getString("note_vento"),
                             rs.getFloat("media_umidita"),
                             rs.getFloat("score_medio_umidita"),
                             rs.getInt("num_umidita"),
-                            rs.getString("note_umidita"),
                             rs.getFloat("media_pressione"),
                             rs.getFloat("score_medio_pressione"),
                             rs.getInt("num_pressione"),
-                            rs.getString("note_pressione"),
                             rs.getFloat("media_temperatura"),
                             rs.getFloat("score_medio_temperatura"),
                             rs.getInt("num_temperatura"),
-                            rs.getString("note_temperatura"),
                             rs.getFloat("media_precipitazioni"),
                             rs.getFloat("score_medio_precipitazioni"),
                             rs.getInt("num_precipitazioni"),
-                            rs.getString("note_precipitazioni"),
                             rs.getFloat("media_altitudine_ghiacciai"),
                             rs.getFloat("score_medio_altitudine_ghiacciai"),
                             rs.getInt("num_altitudine_ghiacciai"),
-                            rs.getString("note_altitudine_ghiacciai"),
                             rs.getFloat("media_massa_ghiacciai"),
                             rs.getFloat("score_medio_massa_ghiacciai"),
-                            rs.getInt("num_massa_ghiacciai"),
-                            rs.getString("note_massa_ghiacciai")
+                            rs.getInt("num_massa_ghiacciai")
                     );
 
-                    risultati.add(parametri);
+                  return pc;
                 } else {
                     System.out.println("Nessun dato trovato per l'area di interesse: " + areaInteresse);
-                    //viene ritornata una lista vuota
+                    return pc;
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return risultati;
+        return pc;
     }
 
 
@@ -723,33 +733,54 @@ return risultati;
         return lista;
     }
 
-public List<String> getTutteAreeInteresse (int id){
-        String sql= "select DISTINCT denominazione_ufficiale from areeinteresse where id > ? ";
+    public List<String> getTutteAreeInteresse(int id) {
+        String sql = "select DISTINCT denominazione_ufficiale from areeinteresse where id > ? ";
         List<String> lista = new ArrayList<>();
-    try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        pstmt.setInt(1,id);
-        ResultSet rs = pstmt.executeQuery();
-        while (rs.next()) {
-            String nome = rs.getString("denominazione_ufficiale");
-            lista.add(nome);
-            Collections.sort(lista);
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                String nome = rs.getString("denominazione_ufficiale");
+                lista.add(nome);
+                Collections.sort(lista);
 
+            }
+            return lista;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
-        return lista;
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return null;
     }
-}
+
+    public List<String> getCentriRegistrati(int id) {
+        String sql = "select DISTINCT nome from centrimonitoraggio where id > ? ";
+        List<String> lista = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                String nome = rs.getString("nome");
+                lista.add(nome);
+                Collections.sort(lista);
+
+            }
+            return lista;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
 
 
+    }
 
 
     public static void main(String[] args) {
         DatabaseConnection dc = new DatabaseConnection();
-      //  dc.createOperatoreRegistrato("luca","marani ", "23", "rr@", "dtdt" ,"4wrwwr",null);
+        //  dc.createOperatoreRegistrato("luca","marani ", "23", "rr@", "dtdt" ,"4wrwwr",null);
 /*
 nel client e/o nel serve vanno implementati dei controlli sui parametri inseriti dall'utente che controllino
  che quest'ultimi non siano null ,
@@ -763,15 +794,9 @@ dei valori stringhe laddove èrichiesto un valore di tipo int
 
  */
 
-
-        List<String> lista = dc.getTutteAreeInteresse(0);
-            for(String a : lista){
-
-                System.out.println(a);
-            }
-        }
-
-
-
-
+        ParametriClimatici parametriClimatici = dc.visualizzaDatiClimatici("Cercenia");
+       if(parametriClimatici==null){
+           System.out.println("è nulll");
+       }
+    }
 }
