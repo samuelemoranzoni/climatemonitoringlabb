@@ -113,7 +113,8 @@ public class AssociazioneAreeCentroFrame extends JFrame {
         linkLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                new InsAreeInteresseFrame().setVisible(true);
+
+                insareain();
             }
         });
         linkLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -122,7 +123,12 @@ public class AssociazioneAreeCentroFrame extends JFrame {
         setContentPane(mainPanel);
 
         // Set minimum size
-        setMinimumSize(new Dimension(400, 300));
+        setMinimumSize(new Dimension(400, 300));  //400 , 300
+    }
+
+    private void insareain() {
+        new InsAreeInteresseFrame().setVisible(true);
+        this.dispose();
     }
 
     private void buttonin() throws NotBoundException, RemoteException {

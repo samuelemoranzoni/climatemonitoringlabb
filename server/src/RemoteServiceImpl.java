@@ -12,6 +12,11 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
     }
 
     @Override
+    public List<Note> getNote(String area) throws RemoteException {
+        return database.getNote(area);
+    }
+
+    @Override
     public Integer get_id_centro(String nome) throws RemoteException {
         return database.get_id_centro(nome);
     }
@@ -47,14 +52,14 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
     }
 
     @Override
-    public List<AreaGeografica> cercaAreaGeograficaPerDenominazioneeStato(String nomeArea, String nomeStato) throws RemoteException {
+    public AreaGeografica cercaAreaGeograficaPerDenominazioneeStato(String nomeArea, String nomeStato) throws RemoteException {
         return database.cercaAreaGeograficaPerDenominazioneeStato(nomeArea, nomeStato);
     }
 
 
 
     @Override
-    public List<AreaGeografica> cercaPerCoordinate(double latitudine, double longitudine) throws RemoteException {
+    public AreaGeografica cercaPerCoordinate(double latitudine, double longitudine) throws RemoteException {
         return database.cercaPerCoordinate(latitudine, longitudine);
     }
 

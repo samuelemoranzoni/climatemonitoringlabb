@@ -547,8 +547,9 @@ public class DatabaseConnection {
     }
 
 
-    public synchronized List<AreaGeografica> cercaAreaGeograficaPerDenominazioneeStato(String denominazione_ufficiale,String stato) {
-        List<AreaGeografica> risultati = new ArrayList<>();
+    public synchronized AreaGeografica cercaAreaGeograficaPerDenominazioneeStato(String denominazione_ufficiale,String stato) {
+      AreaGeografica a=null;
+
         String sql = "SELECT * FROM areeinteresse WHERE denominazione_ufficiale ILIKE ? AND stato ILIKE ?";
 
         try {
@@ -559,20 +560,21 @@ public class DatabaseConnection {
             ResultSet rs = pstmt.executeQuery();
             String ris = null;
             while (rs.next()) {
-                AreaGeografica area = new AreaGeografica(
+                a = new AreaGeografica(
                         rs.getString("denominazione_ufficiale"),
                         rs.getString("stato"),
                         rs.getDouble("latitudine"),
                         rs.getDouble("longitudine")
                 );
-                risultati.add(area);
+               return a;
 
             }
 //lista vuota se non esistono area con con determinata denominazione
         } catch (SQLException e) {
             e.printStackTrace();
+            return a;
         }
-        return risultati;
+        return a;
 
     }
 /*
@@ -604,8 +606,8 @@ public class DatabaseConnection {
 */
 
     // Ricerca per coordinate geografiche
-    public synchronized List<AreaGeografica> cercaPerCoordinate(double latitudine, double longitudine) {
-        List<AreaGeografica> risultati = new ArrayList<>();
+    public synchronized AreaGeografica cercaPerCoordinate(double latitudine, double longitudine) {
+       AreaGeografica a=null;
         //serve a selezionare la riga dalla tabella CoordinateMonitoraggio con le coordinate più vicine a un punto specifico
         String sql = "SELECT * " +
                 "FROM areeinteresse " +
@@ -622,19 +624,19 @@ public class DatabaseConnection {
 
             while (rs.next()) {
 
-                AreaGeografica area = new AreaGeografica
+                a = new AreaGeografica
                         (rs.getString("denominazione_ufficiale"), rs.getString("stato"),
                                 rs.getDouble("latitudine"), rs.getDouble("longitudine"));
 
-                risultati.add(area);
+               return a;
 
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-
+            return a;
         }
-        return risultati;
+        return a;
     }
 
     // Metodo per visualizzare le informazioni climatiche di un'area di interesse, ILIKE permette di ignorare la differenza tra minuscole e maiuscole
@@ -777,6 +779,50 @@ public class DatabaseConnection {
 
     }
 
+    public List<Note> getNote(String area) {
+        String sql = "SELECT centro_monitoraggio_id, operatore_id, data_rilevazione, nota_vento, nota_umidita, nota_pressione, nota_temperatura, nota_precipitazioni, " +
+                "nota_altitudine_ghiacciai, nota_massa_ghiacciai " +
+                "FROM public.parametriclimatici " +
+                "WHERE coordinate_monitoraggio_id = ?";
+
+        List<Note> listaNote = new ArrayList<>(); // Initialize the list to avoid null pointer exceptions
+        int id_area = this.get_id_denominazione_area(area); // Assuming this method returns the correct id
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id_area); // Set the parameter value for the prepared statement
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                // Creating the Note object using the constructor you mentioned
+                Note note = new Note(
+                        rs.getInt("centro_monitoraggio_id"),
+                        rs.getInt("operatore_id"),
+                        rs.getDate("data_rilevazione"),
+                        rs.getString("nota_vento"),
+                        rs.getString("nota_umidita"),
+                        rs.getString("nota_pressione"),
+                        rs.getString("nota_temperatura"),
+                        rs.getString("nota_precipitazioni"),
+                        rs.getString("nota_altitudine_ghiacciai"),
+                        rs.getString("nota_massa_ghiacciai")
+                );
+
+                // Add the created Note object to the list
+                listaNote.add(note);
+            }
+
+            return listaNote; // Return the list of Note objects
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null; // Return null in case of an exception
+        }
+    }
+
+
 
     public static void main(String[] args) {
         DatabaseConnection dc = new DatabaseConnection();
@@ -794,9 +840,13 @@ dei valori stringhe laddove èrichiesto un valore di tipo int
 
  */
 
-        ParametriClimatici parametriClimatici = dc.visualizzaDatiClimatici("Cercenia");
-       if(parametriClimatici==null){
-           System.out.println("è nulll");
-       }
+        List<Note> noteList=dc.getNote("Cercenia");
+        if (noteList != null) {
+            for (Note nota : noteList) {
+                System.out.println(nota);
+            }
+        } else {
+            System.out.println("Nessuna nota trovata o si è verificato un errore.");
+        }
     }
 }

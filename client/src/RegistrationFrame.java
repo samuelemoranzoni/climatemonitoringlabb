@@ -11,13 +11,11 @@ public class RegistrationFrame extends JFrame {
     private JTextField nomeField, cognomeField, codiceFiscaleField, emailField, usernameField;
     private JPasswordField passwordField;
     private JComboBox<String> idMonitoraggioComboBox;
-    JFrame previousframe;
     private RemoteService stub;
 
 
 
     public RegistrationFrame(JFrame frame) throws IOException, NotBoundException {
-        this.previousframe = frame;
         setTitle("Registrazione Operatore");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -117,7 +115,7 @@ public class RegistrationFrame extends JFrame {
         });
 
         backButton.addActionListener(e -> {
-            previousframe.setVisible(true);
+           new ClientLoginGUI().setVisible(true);
             dispose();
         });
     }
@@ -239,7 +237,7 @@ public class RegistrationFrame extends JFrame {
             default:
                 if (risposta > 0) {
                     JOptionPane.showMessageDialog(this, "Registrazione avvenuta con successo. ID utente: " + risposta);
-                    new ClientLoginGUI(new Menuoperatorareaframe(new ClimateMonitoringGUI())).setVisible(true);
+                    new ClientLoginGUI().setVisible(true);
                     dispose();
                 }
         }

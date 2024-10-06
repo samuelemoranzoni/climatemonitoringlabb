@@ -22,10 +22,10 @@ public class RicercaAreaGeograficaFrame extends JFrame {
     private JButton visualizzaButton;
     private RemoteService stub;
 
-    private AreaGeografica areadavisualizzare;
+    private AreaGeografica area;
 
+    private JButton tornaIndietroButton;
 
-    private List<AreaGeografica> risultatiCorrente;
 
     // Costanti di stile
     private final Font TITLE_FONT = new Font("Arial", Font.BOLD, 16);
@@ -36,7 +36,7 @@ public class RicercaAreaGeograficaFrame extends JFrame {
 
     public RicercaAreaGeograficaFrame() throws RemoteException, NotBoundException {
         setTitle("Ricerca Area Geografica");
-        setSize(500, 600);
+        setSize(500, 675);  //600
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         //accesso rmi
@@ -82,13 +82,14 @@ public class RicercaAreaGeograficaFrame extends JFrame {
         risultatoPanel.setBackground(Color.WHITE);
 
         JScrollPane scrollPane = new JScrollPane(risultatoPanel);
-        scrollPane.setPreferredSize(new Dimension(450, 200));
+        scrollPane.setPreferredSize(new Dimension(450, 300)); //200
         gbc.gridy = 9;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         mainPanel.add(scrollPane, gbc);
 
         visualizzaButton = createStyledButton("Visualizza");
+
         visualizzaButton.setEnabled(false);
         gbc.gridy = 10;
         gbc.weighty = 0.0;
@@ -108,11 +109,31 @@ public class RicercaAreaGeograficaFrame extends JFrame {
             }
         });
         cercaPerCoordinateButton.addActionListener(e -> cercaPerCoordinate());
-        visualizzaButton.addActionListener(e -> visualizza());
+        visualizzaButton.addActionListener(e -> {
+            try {
+                visualizza();
+            } catch (NotBoundException ex) {
+                throw new RuntimeException(ex);
+            } catch (RemoteException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        tornaIndietroButton = createStyledButton("Torna Indietro");
+        gbc.gridy = 11;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        mainPanel.add(tornaIndietroButton, gbc);
+
+        tornaIndietroButton.addActionListener(e -> tornaIndietro());
     }
 
-    private void visualizza() {
-      //  new VisualizzaParametriFrame()
+    private void tornaIndietro() {
+        new ClimateMonitoringGUI().setVisible(true);
+        this.dispose();
+    }
+
+    private void visualizza() throws NotBoundException, RemoteException {
+     new VisualizzaParametriFrame(area.getDenominazione());
+     this.dispose();
     }
 
     private JTextField createStyledTextField() {
@@ -160,17 +181,18 @@ public class RicercaAreaGeograficaFrame extends JFrame {
     private void mostraRisultati() {
         risultatoPanel.removeAll();
 
-        if (risultatiCorrente == null || risultatiCorrente.isEmpty()) {
+        if (area == null ) {
             JLabel noResults = new JLabel("Nessun'area trovata");
             noResults.setFont(LABEL_FONT);
             noResults.setAlignmentX(Component.CENTER_ALIGNMENT);
             risultatoPanel.add(noResults);
             visualizzaButton.setEnabled(false);
         } else {
-            for (AreaGeografica area : risultatiCorrente) {
-                JPanel areaPanel = new JPanel(new GridLayout(4, 2, 5, 5));
+
+                JPanel areaPanel = new JPanel(new GridLayout(4, 2, 10, 10)); //10 10
                 areaPanel.setBackground(Color.WHITE);
-                areaPanel.setBorder(BorderFactory.createLineBorder(ACCENT_COLOR));
+                //areaPanel.setBorder(BorderFactory.createLineBorder(ACCENT_COLOR));
+            areaPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
                 aggiungiCampo(areaPanel, "Denominazione:", area.getDenominazione());
                 aggiungiCampo(areaPanel, "Stato:", area.getStato());
@@ -179,8 +201,9 @@ public class RicercaAreaGeograficaFrame extends JFrame {
 
                 areaPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, areaPanel.getPreferredSize().height));
                 risultatoPanel.add(areaPanel);
-                risultatoPanel.add(Box.createVerticalStrut(10));
-            }
+              //  risultatoPanel.add(Box.createVerticalStrut(10));
+            risultatoPanel.add(Box.createVerticalGlue()); // Aggiunge spazio flessibile sotto il risultato
+
             visualizzaButton.setEnabled(true);
         }
 
@@ -191,10 +214,14 @@ public class RicercaAreaGeograficaFrame extends JFrame {
     private void aggiungiCampo(JPanel panel, String label, String value) {
         JLabel labelComponent = new JLabel(label);
         labelComponent.setFont(LABEL_FONT);
+        //panel.add(labelComponent);
+        labelComponent.setHorizontalAlignment(JLabel.RIGHT);
         panel.add(labelComponent);
 
         JLabel valueComponent = new JLabel(value);
         valueComponent.setFont(INPUT_FONT);
+       // panel.add(valueComponent);
+        valueComponent.setHorizontalAlignment(JLabel.LEFT);
         panel.add(valueComponent);
     }
 
@@ -223,7 +250,7 @@ public class RicercaAreaGeograficaFrame extends JFrame {
             return;
         }
 
-        risultatiCorrente = stub.cercaAreaGeograficaPerDenominazioneeStato(denominazione, stato);
+       area = stub.cercaAreaGeograficaPerDenominazioneeStato(denominazione, stato);
         mostraRisultati();
     }
 
@@ -232,7 +259,7 @@ public class RicercaAreaGeograficaFrame extends JFrame {
             double lat = Double.parseDouble(latitudineField.getText().trim().replace(",", "."));
             double lon = Double.parseDouble(longitudineField.getText().trim().replace(",", "."));
 
-            risultatiCorrente = stub.cercaPerCoordinate(lat, lon);
+            area = stub.cercaPerCoordinate(lat, lon);
             mostraRisultati();
         } catch (NumberFormatException ex) {
             mostraErrore("Inserire coordinate valide");

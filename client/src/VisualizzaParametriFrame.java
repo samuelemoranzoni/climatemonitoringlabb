@@ -2,8 +2,7 @@
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
@@ -19,14 +18,19 @@ import java.rmi.registry.Registry;
 
 public class VisualizzaParametriFrame extends JFrame {
 
+    private final Font TITLE_FONT = new Font("Arial", Font.BOLD, 16);
+    private final Font LABEL_FONT = new Font("Arial", Font.PLAIN, 14);
+    private final Font INPUT_FONT = new Font("Arial", Font.PLAIN, 14);
+    private final Color ACCENT_COLOR = new Color(0, 120, 215);
     private ParametriClimatici parametri;
     private RemoteService stub;
-    private String area;
+    private String areadiricerca;
 
     public VisualizzaParametriFrame(String area) throws NotBoundException, RemoteException {
         //accesso rmi
         Registry registry = LocateRegistry.getRegistry("localhost", 1099);
         stub = (RemoteService) registry.lookup("RemoteService");
+        this.areadiricerca=area;
         this.parametri = ottieniparametri(area);
         initializeUI();
     }
@@ -100,29 +104,38 @@ public class VisualizzaParametriFrame extends JFrame {
         // Crea un pannello per i pulsanti
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 10));
 
-        JButton visualizzaCommentiButton = new JButton("Visualizza Commenti");
-        JButton tornaIndietroButton = new JButton("Torna Indietro");
+        JButton visualizzaCommentiButton = createStyledButton(" Commenti ");
+        JButton tornaIndietroButton = createStyledButton("Torna Indietro");
 
         // Personalizza i pulsanti (opzionale)
         visualizzaCommentiButton.setPreferredSize(new Dimension(150, 40));
         tornaIndietroButton.setPreferredSize(new Dimension(150, 40));
+        this.setVisible(true);
 
         // Aggiungi ActionListener ai pulsanti
         visualizzaCommentiButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: Implementa l'azione per visualizzare i commenti tramite RMI
-                JOptionPane.showMessageDialog(VisualizzaParametriFrame.this,
-                        "Funzionalità di visualizzazione commenti non implementata.",
-                        "Info",
-                        JOptionPane.INFORMATION_MESSAGE);
+                try {
+                    visualizzacommentiin();
+                } catch (NotBoundException ex) {
+                    throw new RuntimeException(ex);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
         tornaIndietroButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Chiude questo frame e torna al precedente
+                try {
+                    new RicercaAreaGeograficaFrame().setVisible(true);
+                } catch (RemoteException ex) {
+                    throw new RuntimeException(ex);
+                } catch (NotBoundException ex) {
+                    throw new RuntimeException(ex);
+                }
                 dispose();
             }
         });
@@ -136,6 +149,20 @@ public class VisualizzaParametriFrame extends JFrame {
         // Imposta il pannello principale nel frame
         setContentPane(mainPanel);
         setVisible(true);
+    }
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(TITLE_FONT);
+        button.setForeground(Color.WHITE);
+        button.setBackground(ACCENT_COLOR);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setOpaque(true);
+        return button;
+    }
+    private void visualizzacommentiin() throws NotBoundException, RemoteException {
+        new VisualizzaCommentiFrame(this.areadiricerca);
+        this.dispose();
     }
 
     /**

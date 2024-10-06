@@ -13,10 +13,9 @@ public class ClientLoginGUI extends JFrame {
     private JTextField useridField;
     private JPasswordField passwordField;
     private JLabel statusLabel;
-    JFrame previousframe;
+    //JFrame previousframe;
 
-    public ClientLoginGUI(JFrame frame) {
-        this.previousframe = frame;
+    public ClientLoginGUI() {
         setTitle("Login Operatore");
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -103,7 +102,7 @@ public class ClientLoginGUI extends JFrame {
         // Action listeners
         loginButton.addActionListener(e -> performLogin());
         backButton.addActionListener(e -> {
-            previousframe.setVisible(true);
+            new ClimateMonitoringGUI().setVisible(true);
             dispose();
         });
         registerLink.addMouseListener(new MouseAdapter() {

@@ -87,7 +87,7 @@ class Menuoperatorareaframe extends JFrame {
 
 
     public void loginframein() {
-        new ClientLoginGUI(this).setVisible(true);
+        new ClientLoginGUI().setVisible(true);
         dispose();
     }
 }

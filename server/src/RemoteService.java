@@ -4,6 +4,8 @@ import java.util.List;
 
 public interface RemoteService extends Remote {
 
+    public List<Note> getNote(String area)throws  RemoteException;
+
     public Integer get_id_centro(String nome) throws RemoteException;
     // funziona con zero : prende tutte le area registrate
     public List<String> getCentriRegistrati(int id) throws RemoteException;
@@ -13,11 +15,11 @@ public interface RemoteService extends Remote {
     public List<String> getareeosservatedalcentro(int centromonitoraggioid)throws  RemoteException;
     String ottieniNomeCentro(Integer id) throws RemoteException;
 
-    List<AreaGeografica> cercaAreaGeograficaPerDenominazioneeStato(String nomeArea,String nomeStato) throws RemoteException;
+    AreaGeografica cercaAreaGeograficaPerDenominazioneeStato(String nomeArea,String nomeStato) throws RemoteException;
 
  //   List<AreaGeografica> cercaAreaGeograficaPerStato(String stato) throws RemoteException;
 
-    List<AreaGeografica> cercaPerCoordinate(double latitudine, double longitudine) throws RemoteException;
+   AreaGeografica cercaPerCoordinate(double latitudine, double longitudine) throws RemoteException;
 
   ParametriClimatici visualizzaDatiClimatici(String area) throws RemoteException;
 

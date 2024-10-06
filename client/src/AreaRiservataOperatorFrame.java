@@ -17,7 +17,7 @@ public class AreaRiservataOperatorFrame extends JFrame {
 
     public AreaRiservataOperatorFrame() throws RemoteException, NotBoundException {
         setTitle("Area Riservata Operatore");
-        setSize(800, 500);
+        setSize(800, 500);  //800 500
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
