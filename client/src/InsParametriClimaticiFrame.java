@@ -26,7 +26,12 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-
+/**
+ * Classe per la gestione della finestra di inserimento dei parametri climatici.
+ * Estende JFrame per fornire un'interfaccia grafica per l'inserimento dei dati climatici.
+ * @author Moranzoni Samuele
+ *  @author Di Tullio Edoardo
+ */
 public class InsParametriClimaticiFrame extends JFrame {
     private JComboBox<String> comboBox;
    private RemoteService stub;
@@ -57,6 +62,14 @@ public class InsParametriClimaticiFrame extends JFrame {
     private JTextField massaGhiacciaiField;
     private JSpinner scoreMassaGhiacciaiSpinner;
     private JTextField notaMassaGhiacciaiField;
+
+    /**
+     * Costruttore della classe InsParametriClimaticiFrame.
+     * Inizializza la finestra con i componenti necessari per l'inserimento dei parametri climatici.
+     *
+     * @throws RemoteException se si verifica un errore di comunicazione remota
+     * @throws NotBoundException se il servizio remoto non è stato trovato
+     */
 
     public InsParametriClimaticiFrame() throws RemoteException, NotBoundException {
         super("Inserisci Parametri Climatici");
@@ -92,7 +105,7 @@ public class InsParametriClimaticiFrame extends JFrame {
                     "Errore",
                     JOptionPane.ERROR_MESSAGE);
         }
-//add action listener per combobox
+//aggiunge action listener per combobox
         areaComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -117,7 +130,7 @@ public class InsParametriClimaticiFrame extends JFrame {
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
 
-        // Create a titled border
+        // aggiunge un titolo
         TitledBorder titleBorder = BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(new Color(0, 120, 215), 1),
                 "Parametri Climatici"
@@ -133,8 +146,8 @@ public class InsParametriClimaticiFrame extends JFrame {
         gbc.insets = new Insets(5, 10, 5, 10);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Create and add all components
-       // addFormField(formPanel, gbc, "Area di Interesse:", areaInteresseField = createStyledTextField());
+        // Crea tutti i componenti
+
 
         addFormField(formPanel, gbc, "Data di Rilevazione:", dataRilevazioneField = createStyledTextField());
 
@@ -214,34 +227,14 @@ public class InsParametriClimaticiFrame extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
     }
-//JComboBox per aree di interesse possibili
-  /*  public void setComboBox() throws RemoteException {
-
-        Integer centroid = OperatoreSession.getInstance().getOperatore().getCentroMonitoraggioId();
-        List<String> areeOsservate = stub.getareeosservatedalcentro(centroid);
-        // Crea la JComboBox e popola con le aree
-        comboBox = new JComboBox<>(areeOsservate.toArray(new String[0]));
-
-        // Configura il layout
-        setLayout(new FlowLayout());
-        add(comboBox);
-
-        // Aggiungi un ActionListener per ottenere l'area selezionata
-        comboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                areaSelezionata = (String) comboBox.getSelectedItem();
-                System.out.println("Area selezionata: " + areaSelezionata);
-            }
-        });
-
-        // Configura la finestra
-        setTitle("Selezione Area di Interesse");
-        setSize(1000, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-
-    } */
+    /**
+     * Aggiunge un campo di input al pannello fornito.
+     *
+     * @param panel il pannello al quale aggiungere il campo
+     * @param gbc le costanti di layout per la posizione del campo
+     * @param labelText il testo dell'etichetta per il campo
+     * @param component il componente di input da aggiungere
+     */
     private void addFormField(JPanel panel, GridBagConstraints gbc, String labelText, JComponent component) {
         gbc.gridx = 0;
         gbc.gridy++;
@@ -252,27 +245,46 @@ public class InsParametriClimaticiFrame extends JFrame {
         gbc.weightx = 0.7;
         panel.add(component, gbc);
     }
-
+    /**
+     * Crea un'etichetta stilizzata.
+     *
+     * @param text il testo dell'etichetta
+     * @return l'etichetta creata
+     */
     private JLabel createStyledLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         return label;
     }
-
+    /**
+     * Crea un campo di testo stilizzato.
+     *
+     * @return il campo di testo creato
+     */
     private JTextField createStyledTextField() {
         JTextField textField = new JTextField();
         textField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         textField.setPreferredSize(new Dimension(200, 25));
         return textField;
     }
-
+    /**
+     * Crea uno spinner stilizzato per l'inserimento di numeri.
+     *
+     * @return lo spinner creato
+     */
     private JSpinner createStyledSpinner() {
         JSpinner spinner = new JSpinner(new SpinnerNumberModel(1, 1, 5, 1));
         spinner.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         spinner.setPreferredSize(new Dimension(60, 25));
         return spinner;
     }
-
+    /**
+     * Crea un pulsante stilizzato con il testo e il colore di sfondo specificati.
+     *
+     * @param text il testo da visualizzare sul pulsante
+     * @param bgColor il colore di sfondo del pulsante
+     * @return il pulsante creato
+     */
     private JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -294,7 +306,10 @@ public class InsParametriClimaticiFrame extends JFrame {
 
         return button;
     }
-
+    /**
+     * Esegue l'inserimento dei parametri climatici nel sistema.
+     * Recupera i dati dai campi di input e gestisce i messaggi di errore.
+     */
     private void performinserimentoparametri() {
         try {
 
@@ -409,28 +424,52 @@ public class InsParametriClimaticiFrame extends JFrame {
         }
 
     }
-    /*Questi metodi gestiscono le conversioni e forniscono valori predefiniti se i campi sono vuoti. Se il campo è vuoto
-     o contiene un valore non valido, viene restituito un valore di default (0 per gli interi e 0.0f per i float).*/
+    /**
+     * Analizza un numero intero da una stringa e fornisce un valore di default ( 0 ) se la stringa è vuota.
+     *
+     * @param text la stringa da analizzare
+     * @param fieldName il nome del campo (utilizzato per i messaggi di errore)
+     * @return il numero intero analizzato o 0 se la stringa è vuota
+     * @throws NumberFormatException se la stringa non può essere convertita in intero
+     */
     public int parseInteger (String text, String fieldName) throws NumberFormatException {
         if (text == null || text.trim().isEmpty()) {
             return 0; //  un valore di default appropriato
         }
         return Integer.parseInt(text);
     }
-
+    /**
+     * Analizza un numero a virgola mobile da una stringa e fornisce un valore di default ( 0.0f ) se la stringa è vuota.
+     *
+     * @param text la stringa da analizzare
+     * @param fieldName il nome del campo (utilizzato per i messaggi di errore)
+     * @return il numero a virgola mobile analizzato o 0.0f se la stringa è vuota
+     * @throws NumberFormatException se la stringa non può essere convertita in float
+     */
     private float parseFloat (String text, String fieldName) throws NumberFormatException {
         if (text == null || text.trim().isEmpty()) {
             return 0.0f; // -1 un valore di default appropriato
         }
         return Float.parseFloat(text);
     }
-
+    /**
+     * Torna alla finestra precedente.
+     *
+     * @throws NotBoundException se il servizio remoto non è stato trovato
+     * @throws RemoteException se si verifica un errore di comunicazione remota
+     */
 public void backin() throws NotBoundException, RemoteException {
         new AreaRiservataOperatorFrame().setVisible(true);
         dispose();
 
 
 }
+
+    /**
+     * Metodo principale per avviare l'applicazione.
+     *
+     * @param args gli argomenti della riga di comando (non utilizzati)
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {

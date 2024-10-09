@@ -14,7 +14,9 @@ import java.util.Map;
 
 /**
  * Classe ClientLoginGUI rappresenta l'interfaccia grafica del login per l'operatore.
- * È estesa da JFrame e gestisce il login dell'operatore. Sempre tramite RMI controll
+ * È estesa da JFrame e gestisce il login dell'operatore. Sempre tramite RMI controlla la validità dei valori inseriti dall'utente
+ *@author Moranzoni Samuele
+ *@author Di Tullio Edoardo
  */
 public class ClientLoginGUI extends JFrame {
     private JTextField useridField;

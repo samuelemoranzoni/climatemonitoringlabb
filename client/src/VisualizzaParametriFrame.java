@@ -5,16 +5,17 @@ import java.awt.*;
 import java.awt.event.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-// Assicurati di importare la tua classe ParametriClimatici
-// import your.package.ParametriClimatici;
+/**
+ * Classe che permette la visualizzazione dei parametri climatici in funzione dell'area ricevuta dall'utente nel frame precedente .
+ * Si avvale di RMI per ottenere l'oggetto serializzato ParametriClimatici pi mostrati a schermo.
+ * @author Moranzoni Samuele
+ * @author Di Tullio Edoardo
+ */
 
 public class VisualizzaParametriFrame extends JFrame {
 
@@ -26,6 +27,13 @@ public class VisualizzaParametriFrame extends JFrame {
     private RemoteService stub;
     private String areadiricerca;
 
+    /**
+     * Costruttore frame , gestisci anche oggetti necessari per il bak-end , come Rmi e sovrascrive i parametri climatici di cui mostrerà i risultati
+     * @param area
+     * @throws NotBoundException
+     * @throws RemoteException
+     */
+
     public VisualizzaParametriFrame(String area) throws NotBoundException, RemoteException {
         //accesso rmi
         Registry registry = LocateRegistry.getRegistry("localhost", 1099);
@@ -35,6 +43,9 @@ public class VisualizzaParametriFrame extends JFrame {
         initializeUI();
     }
 
+    /**
+     * inizializza la GUI
+     */
     private void initializeUI() {
         setTitle("Visualizza Parametri Climatici");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -150,6 +161,12 @@ public class VisualizzaParametriFrame extends JFrame {
         setContentPane(mainPanel);
         setVisible(true);
     }
+
+    /**
+     * crea bottoni con un determinato stile e colore
+     * @param text
+     * @return
+     */
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(TITLE_FONT);
@@ -160,6 +177,12 @@ public class VisualizzaParametriFrame extends JFrame {
         button.setOpaque(true);
         return button;
     }
+
+    /**
+     * definisce il bottone Visualizza Commenti chiudendo il frame corrente e aprendo il frame dei commenti (sempre relativi all'area ricevuta dal costruttore in input)
+     * @throws NotBoundException
+     * @throws RemoteException
+     */
     private void visualizzacommentiin() throws NotBoundException, RemoteException {
         new VisualizzaCommentiFrame(this.areadiricerca);
         this.dispose();

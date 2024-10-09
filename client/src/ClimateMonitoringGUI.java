@@ -10,6 +10,8 @@ import javax.imageio.ImageIO;
  * Classe per la GUI di monitoraggio climatico.
  * Questa classe estende JFrame e fornisce un'interfaccia utente per
  * la gestione dei dati climatici.
+ * @author Moranzoni Samuele
+ *  @author Di Tullio Edoardo
  */
 public class ClimateMonitoringGUI extends JFrame {
     private Image backgroundImage;

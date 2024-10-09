@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
@@ -7,24 +8,38 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
 
+/**
+ * Classe RegistrationFrame rappresenta una finestra per la registrazione di un operatore.
+ * Esta finestra consente all'utente di inserire le proprie informazioni per la registrazione
+ * e comunica con il servizio remoto tramite RMI.
+ * @author Moranzoni Samuele
+ *   @author Di Tullio Edoardo
+
+ */
 public class RegistrationFrame extends JFrame {
     private JTextField nomeField, cognomeField, codiceFiscaleField, emailField, usernameField;
     private JPasswordField passwordField;
     private JComboBox<String> idMonitoraggioComboBox;
     private RemoteService stub;
 
-
-
+    /**
+     * Costruttore della classe RegistrationFrame.
+     *
+     * @param frame Il JFrame principale da cui viene chiamato.
+     * @throws IOException Se si verifica un errore di input/output.
+     * @throws NotBoundException Se non riesce a trovare il servizio remoto nel registro.
+     */
     public RegistrationFrame(JFrame frame) throws IOException, NotBoundException {
         setTitle("Registrazione Operatore");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-//accesso tramite rmi
-        Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-         stub = (RemoteService) registry.lookup("RemoteService");
 
-        // Main panel with gradient background
+        // Accesso tramite RMI
+        Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+        stub = (RemoteService) registry.lookup("RemoteService");
+
+        // Pannello principale con sfondo a gradiente
         JPanel mainPanel = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -43,7 +58,7 @@ public class RegistrationFrame extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 30, 10, 30);
 
-        // Title
+        // Titolo
         JLabel titleLabel = new JLabel("Registrazione Operatore");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(new Color(0, 90, 180));
@@ -51,7 +66,7 @@ public class RegistrationFrame extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         mainPanel.add(titleLabel, gbc);
 
-        // Form panel
+        // Pannello del modulo
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setOpaque(false);
         GridBagConstraints formGbc = new GridBagConstraints();
@@ -69,7 +84,7 @@ public class RegistrationFrame extends JFrame {
                 idMonitoraggioComboBox = createStyledComboBox()
         };
 
-        // Add form fields
+        // Aggiungi i campi del modulo
         for (int i = 0; i < labels.length; i++) {
             JLabel label = new JLabel(labels[i]);
             label.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -82,12 +97,10 @@ public class RegistrationFrame extends JFrame {
             formPanel.add(fields[i], formGbc);
         }
 
-
-
         gbc.gridy = 1;
         mainPanel.add(formPanel, gbc);
 
-        // Buttons panel
+        // Pannello dei pulsanti
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 10));
         buttonPanel.setOpaque(false);
 
@@ -103,7 +116,7 @@ public class RegistrationFrame extends JFrame {
 
         add(mainPanel);
 
-        // Action listeners
+        // Listener per le azioni
         registratiButton.addActionListener(e -> {
             try {
                 performRegistration();
@@ -115,11 +128,16 @@ public class RegistrationFrame extends JFrame {
         });
 
         backButton.addActionListener(e -> {
-           new ClientLoginGUI().setVisible(true);
+            new ClientLoginGUI().setVisible(true);
             dispose();
         });
     }
 
+    /**
+     * Crea un campo di testo styled.
+     *
+     * @return Un JTextField con stile personalizzato.
+     */
     private JTextField createStyledTextField() {
         JTextField field = new JTextField();
         field.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -127,21 +145,31 @@ public class RegistrationFrame extends JFrame {
         return field;
     }
 
+    /**
+     * Crea un campo di password styled.
+     *
+     * @return Un JPasswordField con stile personalizzato.
+     */
     private JPasswordField createStyledPasswordField() {
         JPasswordField field = new JPasswordField();
         field.setFont(new Font("Arial", Font.PLAIN, 14));
         field.setPreferredSize(new Dimension(250, 30));
         return field;
     }
-    // New method to create styled ComboBox
+
+    /**
+     * Crea un JComboBox styled per la selezione degli ID di monitoraggio.
+     *
+     * @return Un JComboBox con stile personalizzato.
+     */
     private JComboBox<String> createStyledComboBox() {
         JComboBox<String> comboBox = new JComboBox<>();
         comboBox.setFont(new Font("Arial", Font.PLAIN, 14));
         comboBox.setPreferredSize(new Dimension(250, 30));
         try {
-            comboBox.addItem("Nessun centro"); //prima opzione
+            comboBox.addItem("Nessun centro"); // Prima opzione
             List<String> centri = stub.getCentriRegistrati(0);
-            for(String centro : centri){
+            for (String centro : centri) {
                 comboBox.addItem(centro);
             }
         } catch (Exception ex) {
@@ -154,6 +182,12 @@ public class RegistrationFrame extends JFrame {
         return comboBox;
     }
 
+    /**
+     * Crea un pulsante styled.
+     *
+     * @param text Il testo del pulsante.
+     * @return Un JButton con stile personalizzato.
+     */
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 16));
@@ -164,7 +198,7 @@ public class RegistrationFrame extends JFrame {
         button.setOpaque(true);
         button.setPreferredSize(new Dimension(200, 40));
 
-        // Add hover effect
+        // Aggiungi effetto hover
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(new Color(0, 100, 195));
@@ -178,8 +212,14 @@ public class RegistrationFrame extends JFrame {
         return button;
     }
 
+    /**
+     * Esegue la registrazione dell'operatore.
+     *
+     * @throws RemoteException Se si verifica un errore di comunicazione remota.
+     * @throws NotBoundException Se non riesce a trovare il servizio remoto nel registro.
+     */
     public void performRegistration() throws RemoteException, NotBoundException {
-        // Validate required fields
+        // Validare i campi richiesti
         if (nomeField.getText().isEmpty() || cognomeField.getText().isEmpty() ||
                 codiceFiscaleField.getText().isEmpty() || emailField.getText().isEmpty() ||
                 usernameField.getText().isEmpty() || new String(passwordField.getPassword()).isEmpty()) {
@@ -195,8 +235,6 @@ public class RegistrationFrame extends JFrame {
             if (selectedCentroMonitoraggio.equals("Nessun centro")) {
                 selectedCentroMonitoraggio = null;
             }
-        /*    Integer idMonitoraggio = (selectedCentroMonitoraggio != null && !selectedCentroMonitoraggio.isEmpty()) ?
-                    Integer.valueOf(selectedCentroMonitoraggio) : null;  */
 
             OperatoreRegistrato or = stub.createOperatoreRegistrato(
                     nomeField.getText(), cognomeField.getText(),
@@ -212,6 +250,11 @@ public class RegistrationFrame extends JFrame {
         }
     }
 
+    /**
+     * Gestisce la risposta della registrazione.
+     *
+     * @param risposta Il codice di risposta dalla registrazione.
+     */
     private void handleRegistrationResponse(int risposta) {
         switch (risposta) {
             case -2:
@@ -243,6 +286,11 @@ public class RegistrationFrame extends JFrame {
         }
     }
 
+    /**
+     * Metodo principale per avviare l'applicazione.
+     *
+     * @param args Argomenti della linea di comando.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {

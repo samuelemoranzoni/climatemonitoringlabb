@@ -7,6 +7,8 @@ import java.rmi.NotBoundException;
 
 /**
  * Classe che rappresenta un frame per la creazione di un centro di monitoraggio.
+ * @author Moranzoni Samuele
+ *  @author Di Tullio Edoardo
  */
 public class CenterCreationFrame extends JFrame {
     private JTextField nomeCentroField;

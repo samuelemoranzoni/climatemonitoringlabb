@@ -913,4 +913,11 @@ public class DatabaseConnection {
         }
     }
 
+    public static void main(String[] args) {
+        DatabaseConnection dc= new DatabaseConnection();
+        List<String> List = dc.getTutteAreeInteresse(0);
+        for (String a : List){
+            System.out.println(a);
+        }
+    }
 }

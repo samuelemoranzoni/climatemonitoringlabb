@@ -1,5 +1,3 @@
-;
-
 import javax.swing.*;
 import java.awt.*;
 import java.rmi.NotBoundException;
@@ -9,20 +7,23 @@ import java.rmi.registry.Registry;
 import java.util.List;
 import java.text.SimpleDateFormat;
 
-import javax.swing.*;
-import java.awt.*;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.util.List;
-import java.text.SimpleDateFormat;
-
+/**
+ * Classe che rappresenta un frame per visualizzare i commenti relativi a un'area specifica.
+ * @author Moranzoni Samuele
+ *  @author Di Tullio Edoardo
+ */
 public class VisualizzaCommentiFrame extends JFrame {
     private RemoteService stub;
     private List<Note> noteList;
     private String areaDaCercare;
 
+    /**
+     * Costruttore della classe VisualizzaCommentiFrame.
+     *
+     * @param area L'area per la quale si desidera visualizzare i commenti.
+     * @throws NotBoundException Se il servizio remoto non è registrato nel registry.
+     * @throws RemoteException In caso di errore nella comunicazione remota.
+     */
     public VisualizzaCommentiFrame(String area) throws NotBoundException, RemoteException {
         this.areaDaCercare = area;
         Registry registry = LocateRegistry.getRegistry("localhost", 1099);
@@ -31,6 +32,9 @@ public class VisualizzaCommentiFrame extends JFrame {
         initializeUI();
     }
 
+    /**
+     * Inizializza l'interfaccia utente.
+     */
     private void initializeUI() {
         setTitle("Visualizza Commenti - Area: " + areaDaCercare);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -76,8 +80,7 @@ public class VisualizzaCommentiFrame extends JFrame {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(Color.WHITE);
         JButton backButton = createStyledButton("Torna Indietro");
-        backButton.addActionListener(e ->
-        {
+        backButton.addActionListener(e -> {
             try {
                 new VisualizzaParametriFrame(areaDaCercare);
             } catch (NotBoundException ex) {
@@ -86,8 +89,7 @@ public class VisualizzaCommentiFrame extends JFrame {
                 throw new RuntimeException(ex);
             }
             dispose();
-        })
-                ;
+        });
         bottomPanel.add(backButton);
 
         add(mainPanel, BorderLayout.CENTER);
@@ -97,6 +99,12 @@ public class VisualizzaCommentiFrame extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Crea un pannello per visualizzare i dettagli di una nota.
+     *
+     * @param note La nota da visualizzare.
+     * @return Un pannello contenente i dettagli della nota.
+     */
     private JPanel createNotePanel(Note note) {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.WHITE);
@@ -125,6 +133,14 @@ public class VisualizzaCommentiFrame extends JFrame {
         return panel;
     }
 
+    /**
+     * Aggiunge un campo al pannello della nota.
+     *
+     * @param panel Il pannello al quale aggiungere il campo.
+     * @param gbc   Le costanti di layout per la posizione del campo.
+     * @param label L'etichetta del campo.
+     * @param value Il valore del campo.
+     */
     private void addField(JPanel panel, GridBagConstraints gbc, String label, String value) {
         JLabel fieldLabel = new JLabel(label + ":", JLabel.LEFT);
         fieldLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -135,6 +151,12 @@ public class VisualizzaCommentiFrame extends JFrame {
         panel.add(fieldValue, gbc);
     }
 
+    /**
+     * Crea un pulsante stilizzato.
+     *
+     * @param text Il testo del pulsante.
+     * @return Un pulsante stilizzato.
+     */
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 16));
@@ -147,6 +169,11 @@ public class VisualizzaCommentiFrame extends JFrame {
         return button;
     }
 
+    /**
+     * Metodo principale per avviare l'applicazione.
+     *
+     * @param args Argomenti della riga di comando (non utilizzati).
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
@@ -157,4 +184,3 @@ public class VisualizzaCommentiFrame extends JFrame {
         });
     }
 }
-
