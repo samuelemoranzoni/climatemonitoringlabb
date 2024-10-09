@@ -5,7 +5,12 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
+/**
+ * Classe che rappresenta il frame per l'associazione delle aree esistenti
+ * al centro di monitoraggio dell'operatore che sta utilizzando l'applicazione.
+ * @author Moranzoni Samuele
+ * @author  Di Tullio Edoardo
+ */
 public class AssociazioneAreeCentroFrame extends JFrame {
     private RemoteService stub;
     private int centroMonitoraggioId;
@@ -14,7 +19,12 @@ public class AssociazioneAreeCentroFrame extends JFrame {
     private JComboBox<String> searchComboBox;
     private JButton aggiungiButton;
     private JButton backButton;
-
+    /**
+     * Costruttore che inizializza il frame per l'associazione delle aree.
+     *
+     * @throws RemoteException se c'è un errore nella comunicazione remota.
+     * @throws NotBoundException se il servizio remoto non è collegato.
+     */
     public AssociazioneAreeCentroFrame() throws RemoteException, NotBoundException {
         Registry registry = LocateRegistry.getRegistry("localhost", 1099);
         stub = (RemoteService) registry.lookup("RemoteService");
@@ -40,7 +50,9 @@ public class AssociazioneAreeCentroFrame extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
-
+    /**
+     * Inizializza i componenti del frame.
+     */
     private void initComponents() {
         // Main panel
         JPanel mainPanel = new JPanel();
@@ -126,16 +138,29 @@ public class AssociazioneAreeCentroFrame extends JFrame {
         setMinimumSize(new Dimension(400, 300));  //400 , 300
     }
 
+    /**
+     * Apre il frame per inserire una nuova area di interesse.
+     */
     private void insareain() {
         new InsAreeInteresseFrame().setVisible(true);
         this.dispose();
     }
-
+    /**
+     * Torna alla schermata dell'area riservata per l'operatore.
+     *
+     * @throws NotBoundException se il servizio remoto non è collegato.
+     * @throws RemoteException se c'è un errore nella comunicazione remota.
+     */
     private void buttonin() throws NotBoundException, RemoteException {
         new AreaRiservataOperatorFrame();
         this.dispose();
     }
-
+    /**
+     * Crea un pulsante stilizzato con il testo specificato.
+     *
+     * @param text il testo da visualizzare sul pulsante.
+     * @return il pulsante creato.
+     */
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 16));
@@ -148,7 +173,9 @@ public class AssociazioneAreeCentroFrame extends JFrame {
         return button;
     }
 
-
+    /**
+     * Aggiorna il contenuto del JComboBox con le aree disponibili.
+     */
 
     private void updateComboBox() {
         comboBoxModel.removeAllElements();
@@ -160,7 +187,11 @@ public class AssociazioneAreeCentroFrame extends JFrame {
             comboBoxModel.addElement("Nessuna area disponibile");
         }
     }
-
+    /**
+     * Metodo principale che avvia l'applicazione.
+     *
+     * @param args gli argomenti da riga di comando (non utilizzati).
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
@@ -170,9 +201,9 @@ public class AssociazioneAreeCentroFrame extends JFrame {
             }
         });
     }
-
-
-
+    /**
+     * Aggiunge l'area selezionata al centro di monitoraggio.
+     */
     private void aggiungiArea() {
         String selectedArea = (String) searchComboBox.getSelectedItem();
         if (selectedArea != null && !selectedArea.trim().isEmpty()) {
@@ -193,7 +224,7 @@ public class AssociazioneAreeCentroFrame extends JFrame {
                 }
                 if(risposta == -2){
 
-                    JOptionPane.showMessageDialog(this, "Errore di connessione: area già assegnata al centro",
+                    JOptionPane.showMessageDialog(this, "Errore : area già assegnata al tuo centro",
                             "Errore", JOptionPane.ERROR_MESSAGE);
                 }
 

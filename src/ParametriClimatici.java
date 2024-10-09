@@ -1,40 +1,69 @@
 import java.io.Serializable;
+import java.io.Serializable;
 
+/**
+ * Classe per rappresentare i parametri climatici registrati.
+ * Questa classe è serializzata e contiene variabili per memorizzare i dati climatici principali.
+ * @author Moranzoni Samuele
+ * @author Di Tullio Edoardo
+ */
 public class ParametriClimatici implements Serializable {
     private static final long serialVersionUID = 1;
-  //  private String dateRilevazioni;
+
     private float mediaVelocitaVento;
     private float scoreMedioVento;
     private int numVento;
-   // private String noteVento;
+
     private float mediaUmidita;
     private float scoreMedioUmidita;
     private int numUmidita;
-   // private String noteUmidita;
+
     private float mediaPressione;
     private float scoreMedioPressione;
     private int numPressione;
- //   private String notePressione;
+
     private float mediaTemperatura;
     private float scoreMedioTemperatura;
     private int numTemperatura;
-  //  private String noteTemperatura;
+
     private float mediaPrecipitazioni;
     private float scoreMedioPrecipitazioni;
     private int numPrecipitazioni;
-  //  private String notePrecipitazioni;
+
     private float mediaAltitudineGhiacciai;
     private float scoreMedioAltitudineGhiacciai;
     private int numAltitudineGhiacciai;
- //   private String noteAltitudineGhiacciai;
+
     private float mediaMassaGhiacciai;
     private float scoreMedioMassaGhiacciai;
     private int numMassaGhiacciai;
- //   private String noteMassaGhiacciai;
 
-    // Costruttore aggiornato
-
-    public ParametriClimatici( float mediaVelocitaVento, float scoreMedioVento, int numVento,
+    /**
+     * Costruttore della classe <code>ParametriClimatici</code> che inizializza tutti i parametri climatici.
+     *
+     * @param mediaVelocitaVento la media della velocità del vento
+     * @param scoreMedioVento il punteggio medio del vento
+     * @param numVento il numero di rilevazioni della velocità del vento
+     * @param mediaUmidita la media dell'umidità
+     * @param scoreMedioUmidita il punteggio medio dell'umidità
+     * @param numUmidita il numero di rilevazioni dell'umidità
+     * @param mediaPressione la media della pressione atmosferica
+     * @param scoreMedioPressione il punteggio medio della pressione
+     * @param numPressione il numero di rilevazioni della pressione
+     * @param mediaTemperatura la media della temperatura
+     * @param scoreMedioTemperatura il punteggio medio della temperatura
+     * @param numTemperatura il numero di rilevazioni della temperatura
+     * @param mediaPrecipitazioni la media delle precipitazioni
+     * @param scoreMedioPrecipitazioni il punteggio medio delle precipitazioni
+     * @param numPrecipitazioni il numero di rilevazioni delle precipitazioni
+     * @param mediaAltitudineGhiacciai la media dell'altitudine dei ghiacciai
+     * @param scoreMedioAltitudineGhiacciai il punteggio medio dell'altitudine dei ghiacciai
+     * @param numAltitudineGhiacciai il numero di rilevazioni dell'altitudine dei ghiacciai
+     * @param mediaMassaGhiacciai la media della massa dei ghiacciai
+     * @param scoreMedioMassaGhiacciai il punteggio medio della massa dei ghiacciai
+     * @param numMassaGhiacciai il numero di rilevazioni della massa dei ghiacciai
+     */
+    public ParametriClimatici(float mediaVelocitaVento, float scoreMedioVento, int numVento,
                               float mediaUmidita, float scoreMedioUmidita, int numUmidita,
                               float mediaPressione, float scoreMedioPressione, int numPressione,
                               float mediaTemperatura, float scoreMedioTemperatura, int numTemperatura,
@@ -44,67 +73,67 @@ public class ParametriClimatici implements Serializable {
         this.mediaVelocitaVento = mediaVelocitaVento;
         this.scoreMedioVento = scoreMedioVento;
         this.numVento = numVento;
-        //this.noteVento = noteVento;
+
         this.mediaUmidita = mediaUmidita;
         this.scoreMedioUmidita = scoreMedioUmidita;
         this.numUmidita = numUmidita;
-      //  this.noteUmidita = noteUmidita;
+
         this.mediaPressione = mediaPressione;
         this.scoreMedioPressione = scoreMedioPressione;
         this.numPressione = numPressione;
-      //  this.notePressione = notePressione;
+
         this.mediaTemperatura = mediaTemperatura;
         this.scoreMedioTemperatura = scoreMedioTemperatura;
         this.numTemperatura = numTemperatura;
-       // this.noteTemperatura = noteTemperatura;
+
         this.mediaPrecipitazioni = mediaPrecipitazioni;
         this.scoreMedioPrecipitazioni = scoreMedioPrecipitazioni;
         this.numPrecipitazioni = numPrecipitazioni;
-    //    this.notePrecipitazioni = notePrecipitazioni;
+
         this.mediaAltitudineGhiacciai = mediaAltitudineGhiacciai;
         this.scoreMedioAltitudineGhiacciai = scoreMedioAltitudineGhiacciai;
         this.numAltitudineGhiacciai = numAltitudineGhiacciai;
-      //  this.noteAltitudineGhiacciai = noteAltitudineGhiacciai;
+
         this.mediaMassaGhiacciai = mediaMassaGhiacciai;
         this.scoreMedioMassaGhiacciai = scoreMedioMassaGhiacciai;
         this.numMassaGhiacciai = numMassaGhiacciai;
-      //  this.noteMassaGhiacciai = noteMassaGhiacciai;
     }
 
-    // Getter e setter per tutti i campi
+    // Getter e Setter
 
-    // Metodi getter per esempio
-  //  public String getDateRilevazioni() { return dateRilevazioni; }
     public float getMediaVelocitaVento() { return mediaVelocitaVento; }
     public float getScoreMedioVento() { return scoreMedioVento; }
     public int getNumVento() { return numVento; }
-  //  public String getNoteVento() { return noteVento; }
+
     public float getMediaUmidita() { return mediaUmidita; }
     public float getScoreMedioUmidita() { return scoreMedioUmidita; }
     public int getNumUmidita() { return numUmidita; }
-  //  public String getNoteUmidita() { return noteUmidita; }
+
     public float getMediaPressione() { return mediaPressione; }
     public float getScoreMedioPressione() { return scoreMedioPressione; }
     public int getNumPressione() { return numPressione; }
-//    public String getNotePressione() { return notePressione; }
+
     public float getMediaTemperatura() { return mediaTemperatura; }
     public float getScoreMedioTemperatura() { return scoreMedioTemperatura; }
     public int getNumTemperatura() { return numTemperatura; }
-  //  public String getNoteTemperatura() { return noteTemperatura; }
+
     public float getMediaPrecipitazioni() { return mediaPrecipitazioni; }
     public float getScoreMedioPrecipitazioni() { return scoreMedioPrecipitazioni; }
     public int getNumPrecipitazioni() { return numPrecipitazioni; }
- //   public String getNotePrecipitazioni() { return notePrecipitazioni; }
+
     public float getMediaAltitudineGhiacciai() { return mediaAltitudineGhiacciai; }
     public float getScoreMedioAltitudineGhiacciai() { return scoreMedioAltitudineGhiacciai; }
     public int getNumAltitudineGhiacciai() { return numAltitudineGhiacciai; }
-//    public String getNoteAltitudineGhiacciai() { return noteAltitudineGhiacciai; }
+
     public float getMediaMassaGhiacciai() { return mediaMassaGhiacciai; }
     public float getScoreMedioMassaGhiacciai() { return scoreMedioMassaGhiacciai; }
     public int getNumMassaGhiacciai() { return numMassaGhiacciai; }
-  //  public String getNoteMassaGhiacciai() { return noteMassaGhiacciai; }
 
-    // Altri metodi setter possono essere aggiunti allo stesso modo
+    /**
+     * Restituisce una rappresentazione in forma di stringa di <code>ParametriClimatici</code>.
+     *
+     * @return una stringa con i dettagli dei parametri climatici
+     */
     @Override
     public String toString() {
         return "ParametriClimatici{\n" +
@@ -131,5 +160,4 @@ public class ParametriClimatici implements Serializable {
                 "num_massa_ghiacciai=" + numMassaGhiacciai + "\n" +
                 '}';
     }
-
 }

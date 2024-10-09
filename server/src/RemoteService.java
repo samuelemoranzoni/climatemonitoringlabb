@@ -2,6 +2,11 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+/**
+ *  interfaccia dei metodi che dovranno essere implementati . componente fondamentale dell'architettura RMI , utilizzata in questo progetto
+ * @author Moranzoni Samuele
+ * @author Di Tullio Edoardo
+ */
 public interface RemoteService extends Remote {
 
     public List<Note> getNote(String area)throws  RemoteException;

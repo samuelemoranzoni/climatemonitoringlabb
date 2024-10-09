@@ -1,22 +1,32 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.image.*;
 import java.io.File;
-import java.net.URL;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import javax.imageio.ImageIO;
 
+/**
+ * Classe per la GUI di monitoraggio climatico.
+ * Questa classe estende JFrame e fornisce un'interfaccia utente per
+ * la gestione dei dati climatici.
+ */
 public class ClimateMonitoringGUI extends JFrame {
     private Image backgroundImage;
 
+    /**
+     * Costruttore per l'oggetto ClimateMonitoringGUI.
+     * Imposta il titolo della finestra, la dimensione e la posizione.
+     * Carica un'immagine di sfondo e crea il pannello principale
+     * con diversi componenti grafici.
+     */
     public ClimateMonitoringGUI() {
         setTitle("Climate Monitoring");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
-        setLocationRelativeTo(null); //frame centrale
+        setLocationRelativeTo(null); // Posiziona il frame al centro
 
-        // Load the background image
+        // Carica l'immagine di sfondo
         try {
             File imageFile = new File("C:\\Users\\samuele\\OneDrive\\Desktop\\UFV\\climate monitoring image.jpeg");
             backgroundImage = ImageIO.read(imageFile);
@@ -24,7 +34,7 @@ public class ClimateMonitoringGUI extends JFrame {
             e.printStackTrace();
         }
 
-        // Create a custom panel with the background image
+        // Crea un pannello personalizzato con l'immagine di sfondo
         JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -37,7 +47,7 @@ public class ClimateMonitoringGUI extends JFrame {
         panel.setLayout(new GridBagLayout());
         setContentPane(panel);
 
-        // Create and add components
+        // Crea e aggiunge i componenti
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -56,29 +66,30 @@ public class ClimateMonitoringGUI extends JFrame {
         panel.add(operatorButton, gbc);
         panel.add(exitButton, gbc);
 
-        // Add action listeners
+        // Aggiungi action listener
         searchButton.addActionListener(e -> {
-
             try {
                 new RicercaAreaGeograficaFrame().setVisible(true);
-            } catch (RemoteException ex) {
-                throw new RuntimeException(ex);
-            } catch (NotBoundException ex) {
+            } catch (RemoteException | NotBoundException ex) {
                 throw new RuntimeException(ex);
             }
             setVisible(false);
         });
 
         operatorButton.addActionListener(e -> {
-
             new Menuoperatorareaframe(this).setVisible(true);
             setVisible(false);
-
         });
 
         exitButton.addActionListener(e -> dispose());
     }
 
+    /**
+     * Crea un pulsante stilizzato con il testo specificato.
+     *
+     * @param text Il testo da visualizzare sul pulsante.
+     * @return Il pulsante stilizzato creato.
+     */
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 16));
@@ -90,6 +101,12 @@ public class ClimateMonitoringGUI extends JFrame {
         return button;
     }
 
+    /**
+     * Punto di ingresso principale dell'applicazione.
+     * Inizializza e visualizza la GUI di monitoraggio climatico.
+     *
+     * @param args Argomenti della riga di comando (non utilizzati).
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new ClimateMonitoringGUI().setVisible(true);

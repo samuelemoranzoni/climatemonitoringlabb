@@ -1,47 +1,57 @@
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.io.IOException;
-import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.NotBoundException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Classe ClientLoginGUI rappresenta l'interfaccia grafica del login per l'operatore.
+ * È estesa da JFrame e gestisce il login dell'operatore. Sempre tramite RMI controll
+ */
 public class ClientLoginGUI extends JFrame {
     private JTextField useridField;
     private JPasswordField passwordField;
     private JLabel statusLabel;
-    //JFrame previousframe;
 
+    /**
+     * Costruttore di ClientLoginGUI.
+     * Inizializza l'interfaccia grafica e i componenti necessari per la login.
+     */
     public ClientLoginGUI() {
         setTitle("Login Operatore");
         setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Main panel
+        // Pannello principale
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 30, 10, 30);
 
-        // Title
+        // Titolo
         JLabel titleLabel = new JLabel("Login Operatore");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(new Color(0, 90, 180));
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         mainPanel.add(titleLabel, gbc);
 
-        // Form panel
+        // Pannello del modulo
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setOpaque(false);
         GridBagConstraints formGbc = new GridBagConstraints();
         formGbc.insets = new Insets(5, 5, 5, 5);
         formGbc.anchor = GridBagConstraints.WEST;
 
-        // Userid field
+        // Campo userid
         JLabel useridLabel = new JLabel("Userid:");
         useridLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         useridField = createStyledTextField();
@@ -51,7 +61,7 @@ public class ClientLoginGUI extends JFrame {
         formGbc.gridx = 1;
         formPanel.add(useridField, formGbc);
 
-        // Password field
+        // Campo password
         JLabel passwordLabel = new JLabel("Password:");
         passwordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         passwordField = createStyledPasswordField();
@@ -64,7 +74,7 @@ public class ClientLoginGUI extends JFrame {
         gbc.gridy = 1;
         mainPanel.add(formPanel, gbc);
 
-        // Buttons panel
+        // Pannello dei pulsanti
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 10));
         buttonPanel.setOpaque(false);
 
@@ -78,7 +88,7 @@ public class ClientLoginGUI extends JFrame {
         gbc.gridy = 2;
         mainPanel.add(buttonPanel, gbc);
 
-        // Registration link
+        // Link di registrazione
         JLabel registerLink = new JLabel("Non hai un account? Registrati qui");
         registerLink.setFont(new Font("Arial", Font.PLAIN, 14));
         registerLink.setForeground(new Color(0, 90, 180));
@@ -91,7 +101,7 @@ public class ClientLoginGUI extends JFrame {
         gbc.gridy = 3;
         mainPanel.add(registerLink, gbc);
 
-        // Status label
+        // Etichetta di stato
         statusLabel = new JLabel("", JLabel.CENTER);
         statusLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridy = 4;
@@ -99,7 +109,7 @@ public class ClientLoginGUI extends JFrame {
 
         add(mainPanel);
 
-        // Action listeners
+        // Listener degli eventi
         loginButton.addActionListener(e -> performLogin());
         backButton.addActionListener(e -> {
             new ClimateMonitoringGUI().setVisible(true);
@@ -113,6 +123,11 @@ public class ClientLoginGUI extends JFrame {
         });
     }
 
+    /**
+     * Crea un campo di testo stilizzato per l'userid.
+     *
+     * @return il campo di testo stilizzato
+     */
     private JTextField createStyledTextField() {
         JTextField field = new JTextField(20);
         field.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -120,6 +135,11 @@ public class ClientLoginGUI extends JFrame {
         return field;
     }
 
+    /**
+     * Crea un campo di password stilizzato.
+     *
+     * @return il campo di password stilizzato
+     */
     private JPasswordField createStyledPasswordField() {
         JPasswordField field = new JPasswordField(20);
         field.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -127,6 +147,12 @@ public class ClientLoginGUI extends JFrame {
         return field;
     }
 
+    /**
+     * Crea un pulsante stilizzato con il testo specificato.
+     *
+     * @param text il testo del pulsante
+     * @return il pulsante stilizzato
+     */
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.BOLD, 16));
@@ -139,6 +165,10 @@ public class ClientLoginGUI extends JFrame {
         return button;
     }
 
+    /**
+     * Esegue l'operazione di login.
+     * Verifica le credenziali dell'utente e gestisce l'accesso.
+     */
     private void performLogin() {
         try {
             String userid = useridField.getText();
@@ -152,6 +182,7 @@ public class ClientLoginGUI extends JFrame {
                 return;
             }
 
+            // Connessione al servizio remoto
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
             RemoteService stub = (RemoteService) registry.lookup("RemoteService");
             OperatoreRegistrato operatore = stub.loginOperatore(userid, password);
@@ -174,18 +205,27 @@ public class ClientLoginGUI extends JFrame {
         }
     }
 
+    /**
+     * Apre il pannello di registrazione.
+     * Invoca la creazione di un nuovo frame di registrazione.
+     */
     private void openRegistrationFrame() {
         SwingUtilities.invokeLater(() -> {
             try {
                 new RegistrationFrame(this).setVisible(true);
                 dispose();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (NotBoundException e) {
+            } catch (IOException | NotBoundException e) {
                 throw new RuntimeException(e);
             }
         });
     }
 
-    // Main method remains unchanged
+    /**
+     * Il metodo main per avviare l'applicazione GUI.
+     *
+     * @param args gli argomenti da riga di comando
+     */
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new ClientLoginGUI().setVisible(true));
+    }
 }

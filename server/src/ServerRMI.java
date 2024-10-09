@@ -2,6 +2,12 @@ import java.rmi.Naming;
 import java.rmi.registry.LocateRegistry;
 
 public class ServerRMI {
+    /**
+     * La classe ServerRMI avvia un server RMI (Remote Method Invocation)
+     * per consentire a client remoti di invocare metodi su un oggetto remoto.
+     *  @author Moranzoni Samuele
+     *  @author Di Tullio Edoardo
+     */
     public static void main(String[] args) {
         try {
             // Crea il database
