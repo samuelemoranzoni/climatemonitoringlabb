@@ -1,13 +1,9 @@
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.List;
 
 /**
  * Classe che rappresenta il frame per la ricerca di aree geografiche .

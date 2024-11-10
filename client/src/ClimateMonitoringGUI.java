@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.*;
 import java.io.File;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;

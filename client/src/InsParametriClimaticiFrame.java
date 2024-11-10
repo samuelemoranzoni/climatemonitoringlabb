@@ -9,23 +9,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.sql.Date;
 import java.util.List;
-import java.util.function.BiConsumer;
-
-
-import javax.swing.*;
 import javax.swing.border.*;
-import java.awt.*;
 import java.awt.event.*;
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.sql.Date;
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.*;
-import java.awt.event.*;
+
 /**
  * Classe per la gestione della finestra di inserimento dei parametri climatici.
  * Estende JFrame per fornire un'interfaccia grafica per l'inserimento dei dati climatici.
@@ -72,6 +58,7 @@ public class InsParametriClimaticiFrame extends JFrame {
      */
 
     public InsParametriClimaticiFrame() throws RemoteException, NotBoundException {
+
         super("Inserisci Parametri Climatici");
         setLayout(new BorderLayout());
         JPanel areaPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
@@ -147,7 +134,6 @@ public class InsParametriClimaticiFrame extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
 
         // Crea tutti i componenti
-
 
         addFormField(formPanel, gbc, "Data di Rilevazione:", dataRilevazioneField = createStyledTextField());
 
@@ -306,20 +292,31 @@ public class InsParametriClimaticiFrame extends JFrame {
 
         return button;
     }
+
     /**
-     * Esegue l'inserimento dei parametri climatici nel sistema.
+     * Esegue l'inserimento dei parametri climatici nel sistema database.
      * Recupera i dati dai campi di input e gestisce i messaggi di errore.
      */
     private void performinserimentoparametri() {
         try {
-
+              if (dataRilevazioneField.getText().isEmpty() ||
+                    velocitaVentoField.getText().isEmpty() ||
+                    umiditaField.getText().isEmpty() ||
+                    pressioneField.getText().isEmpty() ||
+                    temperaturaField.getText().isEmpty() ||
+                    precipitazioniField.getText().isEmpty() ||
+                    altitudineGhiacciaiField.getText().isEmpty() ||
+                    massaGhiacciaiField.getText().isEmpty()) {
+                  JOptionPane.showMessageDialog(this, "Compila tutti i campi prima di salvare i parametri.", "Errore", JOptionPane.ERROR_MESSAGE);
+                  return;
+              }
             // Recupero dei valori dai campi di testo e spinner
             //areaInteresseField.getText();
             String areaInteresse = areaSelezionata;
-            if(areaInteresse.isEmpty()){
+           /* if(areaInteresse.isEmpty()){
                 JOptionPane.showMessageDialog(this, "Errore: area non inserita ", "Errore : area mancante", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
+            } */
             String dataRilevazione = dataRilevazioneField.getText();
 
 // Controlla se la data è nel formato corretto YYYY-MM-DD

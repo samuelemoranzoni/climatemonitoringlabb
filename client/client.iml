@@ -6,7 +6,9 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/client" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/client/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/src/client" />
+      <excludeFolder url="file://$MODULE_DIR$/src/main" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -20,7 +22,7 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="Progettob" exported="" />
-    <orderEntry type="module-library" exported="">
+    <orderEntry type="module-library">
       <library>
         <CLASSES />
         <JAVADOC />
@@ -31,5 +33,15 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="server" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../javafx-sdk-21.0.4/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/../../javafx-sdk-21.0.4/lib" recursive="false" />
+      </library>
+    </orderEntry>
   </component>
 </module>
