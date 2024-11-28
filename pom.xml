@@ -10,9 +10,9 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>server</module>
-        <module>client</module>
-        <module>common</module>
+        <module>src/server</module>
+        <module>src/client</module>
+        <module>src/common</module>
     </modules>
 
     <properties>

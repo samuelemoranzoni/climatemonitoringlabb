@@ -1,7 +1,7 @@
 package climatemonitoring;
 
 
-import climatemonitoring.extensions.ConnessioneNonAttivaException;
+import climatemonitoring.extensions.DatabaseConnectionException;
 
 import javax.swing.*;
 import java.sql.*;
@@ -43,7 +43,11 @@ public class DatabaseConnection {
         }
 
     }
-
+    /**
+     * Stabilisce una connessione con il database.
+     *
+     * @return una connessione al database o null se si è verificato un errore.
+     */
     public Connection connetti() {
         if (connection == null) {
             try {
@@ -57,25 +61,6 @@ public class DatabaseConnection {
             }
         }
         return connection;
-    }
-    /**
-     * Stabilisce una connessione con il database.
-     *
-     * @return una connessione al database o null se si è verificato un errore.
-     */
-    public static Connection connect() {
-        Connection conn = null;
-        try {
-            Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Accesso al database ...");
-        } catch (SQLException e) {
-            System.err.println("Errore di connessione: " + e.getMessage());
-        } catch (ClassNotFoundException e) {
-            System.err.println("Driver non trovato: " + e.getMessage());
-        }
-        return conn;
-
     }
 
     /**
@@ -231,15 +216,14 @@ public class DatabaseConnection {
     }
 
     /**
-     * Verifica se un operatore esiste nel database. Metodo ridondante ma funge da ulteriore controllo di sicurezza.
+     * Verifica se un operatore esiste nel database. Funge da ulteriore controllo di sicurezza.
      *
      * @param operatore_id l'ID dell'operatore.
      * @return true se l'operatore esiste, false altrimenti.
      */
     private boolean operatoreExists(int operatore_id) {
         String sql = "SELECT COUNT(*) FROM OperatoriRegistrati WHERE id=?";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
             pstmt.setInt(1, operatore_id);
             ResultSet rs = pstmt.executeQuery();
@@ -579,7 +563,7 @@ public class DatabaseConnection {
     }
 
     /**
-     * Verifica che l'operatore lavori per il centro di monitoraggio specificato.Metodo ridondante ma funge da ulteriore controllo di sicurezza.
+     * Verifica che l'operatore lavori per il centro di monitoraggio specificato.Funge da ulteriore controllo di sicurezza.
      *
      * @param operatore_id ID dell'operatore.
      * @param centroMonitoraggio_id ID del centro di monitoraggio.
@@ -701,7 +685,7 @@ public class DatabaseConnection {
      * @param stato                   lo stato dell'area.
      * @return un'istanza di climatemonitoring.AreaGeografica o null se non trovata.
      */
-    public synchronized AreaGeografica cercaAreaGeograficaPerDenominazioneeStato(String denominazione_ufficiale, String stato) {
+    public synchronized AreaGeografica cercaAreaGeograficaPerDenominazioneeStato(String denominazione_ufficiale, String stato) throws DatabaseConnectionException {
         AreaGeografica a = null;
 
         String sql = "SELECT * FROM areeinteresse WHERE denominazione_ufficiale ILIKE ? AND stato ILIKE ?";
@@ -721,7 +705,8 @@ public class DatabaseConnection {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return new AreaGeografica("-1","-1",-1,-1);
+            throw new DatabaseConnectionException("errore nella connessione al database" + e.getMessage());
+
         }
         return a; // ritorna null se non trovata
     }
@@ -733,7 +718,7 @@ public class DatabaseConnection {
      * @param longitudine la longitudine di ricerca.
      * @return un'istanza di climatemonitoring.AreaGeografica o null se non trovata.
      */
-    public synchronized AreaGeografica cercaPerCoordinate(double latitudine, double longitudine) throws ConnessioneNonAttivaException {
+    public synchronized AreaGeografica cercaPerCoordinate(double latitudine, double longitudine) throws DatabaseConnectionException  {
         AreaGeografica a = null;
         String sql = "SELECT * " +
                 "FROM areeinteresse " +
@@ -759,8 +744,7 @@ public class DatabaseConnection {
             }
 
         } catch (SQLException e ) {
-            e.printStackTrace();
-            return new AreaGeografica("-1","-1",-1,-1);
+            throw new DatabaseConnectionException("Errore di connessione col database " + e.getMessage());
 
         }
         return a; // ritorna null se non trovata
@@ -772,7 +756,7 @@ public class DatabaseConnection {
      * @param areaInteresse il nome dell'area di interesse.
      * @return i parametri climatici dell'area oppure null se non trovati.
      */
-    public synchronized ParametriClimatici visualizzaDatiClimatici(String areaInteresse) {
+    public synchronized ParametriClimatici visualizzaDatiClimatici(String areaInteresse) throws DatabaseConnectionException {
         ParametriClimatici pc = null;
 
         // Verifica se l'area esiste prima di eseguire la query principale
@@ -826,14 +810,16 @@ public class DatabaseConnection {
                     return pc;
                 } else {
                     System.out.println("Nessun dato trovato per l'area di interesse: " + areaInteresse);
-                    return pc;
+                    return pc;  //return null
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DatabaseConnectionException("errore nella connessione al database" + e.getMessage());
+
         }
 
-        return pc; // ritorna null se non trovati
+
     }
 
     /**
@@ -842,7 +828,7 @@ public class DatabaseConnection {
      * @param centromonitoraggioid ID del centro di monitoraggio.
      * @return una lista di nomi delle aree osservate.
      */
-    public List<String> getareeosservatedalcentro(int centromonitoraggioid) {
+    public List<String> getareeosservatedalcentro(int centromonitoraggioid) throws DatabaseConnectionException {
         String sql = "SELECT DISTINCT ai.denominazione_ufficiale " +
                 "FROM areeinteresse ai " +
                 "JOIN areecontrollate ac ON ai.id = ac.area_id " +
@@ -861,6 +847,9 @@ public class DatabaseConnection {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new DatabaseConnectionException("errore di connesione" + e.getMessage());
+
+
         }
         return lista;
     }
@@ -871,7 +860,7 @@ public class DatabaseConnection {
      * @param id ID minimo da cui iniziare la ricerca. Se id = 0 restituirà tutte le aree di interesse.
      * @return una lista di nomi delle aree di interesse.
      */
-    public List<String> getTutteAreeInteresse(int id) {
+    public List<String> getTutteAreeInteresse(int id) throws DatabaseConnectionException {
         String sql = "select DISTINCT denominazione_ufficiale from areeinteresse where id > ? ";
         List<String> lista = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -886,7 +875,7 @@ public class DatabaseConnection {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            throw new DatabaseConnectionException("errore di connesione al database" + e.getMessage());
         }
     }
 
@@ -896,7 +885,7 @@ public class DatabaseConnection {
      * @param id ID minimo da cui iniziare la ricerca. Se si associa 0 , restituirà tutti i centri registrati.
      * @return una lista di nomi dei centri registrati.
      */
-    public List<String> getCentriRegistrati(int id) {
+    public List<String> getCentriRegistrati(int id) throws DatabaseConnectionException {
         String sql = "select DISTINCT nome from centrimonitoraggio where id > ? ";
         List<String> lista = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -911,7 +900,7 @@ public class DatabaseConnection {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            throw new DatabaseConnectionException("errore di connessione al database" + e.getMessage());
         }
     }
 
@@ -921,7 +910,7 @@ public class DatabaseConnection {
      * @param area il nome dell'area di interesse.
      * @return una lista di oggetti climatemonitoring.Note associati all'area specificata.
      */
-    public List<Note> getNote(String area) {
+    public List<Note> getNote(String area) throws DatabaseConnectionException {
         String sql = "SELECT centro_monitoraggio_id, operatore_id, data_rilevazione, nota_vento, nota_umidita, nota_pressione, nota_temperatura, nota_precipitazioni, " +
                 "nota_altitudine_ghiacciai, nota_massa_ghiacciai " +
                 "FROM public.parametriclimatici " +
@@ -959,12 +948,11 @@ public class DatabaseConnection {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return null; // returna null in caso di eccezione
+            throw new DatabaseConnectionException("errore di connessione al database" + e.getMessage());
+
         }
     }
 
-    public static void main(String[] args) throws ConnessioneNonAttivaException {
-
-
+    public static void main(String[] args) {
     }
 }

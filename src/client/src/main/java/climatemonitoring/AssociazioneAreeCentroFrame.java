@@ -1,5 +1,7 @@
 package climatemonitoring;
 
+import climatemonitoring.extensions.DatabaseConnectionException;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -27,21 +29,38 @@ public class AssociazioneAreeCentroFrame extends JFrame {
      * @throws RemoteException se c'è un errore nella comunicazione remota.
      * @throws NotBoundException se il servizio remoto non è collegato.
      */
-    public AssociazioneAreeCentroFrame() throws RemoteException, NotBoundException {
-        Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-        stub = (RemoteService) registry.lookup("climatemonitoring.RemoteService");
-        centroMonitoraggioId = OperatoreSession.getInstance().getOperatore().getCentroMonitoraggioId();
-        String nomecentro = stub.ottieniNomeCentro(centroMonitoraggioId);
-        String centrodiriferimento = (nomecentro != null) ? nomecentro : "centro non assegnato";
-        setTitle("Associazione Aree Esistenti al tuo Centro: " + centrodiriferimento);
+    public AssociazioneAreeCentroFrame()  {
+        Registry registry = null;
+        try {
+            registry = LocateRegistry.getRegistry("localhost", 1099);
+            stub = (RemoteService) registry.lookup("climatemonitoring.RemoteService");
+            centroMonitoraggioId = OperatoreSession.getInstance().getOperatore().getCentroMonitoraggioId();
+            String nomecentro = stub.ottieniNomeCentro(centroMonitoraggioId);
+            String centrodiriferimento = (nomecentro != null) ? nomecentro : "centro non assegnato";
+            setTitle("Associazione Aree Esistenti al tuo Centro: " + centrodiriferimento);
+        } catch (RemoteException e) {
+            JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException(e);
+        } catch (NotBoundException e) {
+            JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException(e);
+        }
+
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         try {
-            tutteLeAree = stub.getTutteAreeInteresse(0);
+            try {
+                tutteLeAree = stub.getTutteAreeInteresse(0);
+            } catch (DatabaseConnectionException e) {
+                JOptionPane.showMessageDialog(this, "Errore di connessione al database",
+                        "Errore", JOptionPane.ERROR_MESSAGE);
+                throw new RuntimeException(e);
+            }
         } catch (RemoteException e) {
             JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
+            throw new RuntimeException(e);
 
 
         }
@@ -108,8 +127,10 @@ public class AssociazioneAreeCentroFrame extends JFrame {
                     try {
                         buttonin();
                     } catch (NotBoundException ex) {
+                        JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                         throw new RuntimeException(ex);
                     } catch (RemoteException ex) {
+                        JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                         throw new RuntimeException(ex);
                     }
                 });
@@ -194,13 +215,7 @@ public class AssociazioneAreeCentroFrame extends JFrame {
      * @param args gli argomenti da riga di comando (non utilizzati).
      */
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                new AssociazioneAreeCentroFrame();
-            } catch (RemoteException | NotBoundException e) {
-                e.printStackTrace();
-            }
-        });
+
     }
     /**
      * Aggiunge l'area selezionata al centro di monitoraggio.

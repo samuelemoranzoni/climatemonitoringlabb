@@ -77,8 +77,10 @@ public class AreaRiservataOperatorFrame extends JFrame {
             gbc.insets = new Insets(5, 30, 20, 30);
             mainPanel.add(welcomeLabel, gbc);
         } catch (RemoteException e) {
+            JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
         } catch (NotBoundException e) {
+            JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
         }
 
@@ -104,6 +106,7 @@ public class AreaRiservataOperatorFrame extends JFrame {
                     try {
                         parametriclimaticiin();
                     } catch (NotBoundException | RemoteException ex) {
+                        JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                         throw new RuntimeException(ex);
                     }
                 },
@@ -113,12 +116,14 @@ public class AreaRiservataOperatorFrame extends JFrame {
                     try {
                         associareaincentroin();
                     } catch (NotBoundException | RemoteException ex) {
+                        JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
                         throw new RuntimeException(ex);
                     }
                 },
                 e -> {
-                    this.dispose();
+
                     ClimateMonitoringGUI.main(null);
+                    this.dispose();
                 }
         };
 

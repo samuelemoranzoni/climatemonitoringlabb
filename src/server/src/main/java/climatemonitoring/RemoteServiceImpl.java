@@ -1,6 +1,7 @@
 package climatemonitoring;
 
-import climatemonitoring.extensions.ConnessioneNonAttivaException;
+
+import climatemonitoring.extensions.DatabaseConnectionException;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -36,7 +37,7 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
      * @throws RemoteException Se si verifica un errore di comunicazione remota.
      */
     @Override
-    public List<Note> getNote(String area) throws RemoteException {
+    public List<Note> getNote(String area) throws RemoteException, DatabaseConnectionException {
         return database.getNote(area);
     }
 
@@ -60,7 +61,7 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
      * @throws RemoteException Se si verifica un errore di comunicazione remota.
      */
     @Override
-    public List<String> getCentriRegistrati(int id) throws RemoteException {
+    public List<String> getCentriRegistrati(int id) throws RemoteException, DatabaseConnectionException {
         return database.getCentriRegistrati(0);
     }
 
@@ -84,7 +85,7 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
      * @throws RemoteException Se si verifica un errore di comunicazione remota.
      */
     @Override
-    public List<String> getTutteAreeInteresse(int id) throws RemoteException {
+    public List<String> getTutteAreeInteresse(int id) throws RemoteException, DatabaseConnectionException {
         return database.getTutteAreeInteresse(id);
     }
 
@@ -109,7 +110,7 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
      * @throws RemoteException Se si verifica un errore di comunicazione remota.
      */
     @Override
-    public List<String> getareeosservatedalcentro(int centromonitoraggioid) throws RemoteException {
+    public List<String> getareeosservatedalcentro(int centromonitoraggioid) throws RemoteException, DatabaseConnectionException {
         return database.getareeosservatedalcentro(centromonitoraggioid);
     }
 
@@ -134,7 +135,7 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
      * @throws RemoteException Se si verifica un errore di comunicazione remota.
      */
     @Override
-    public AreaGeografica cercaAreaGeograficaPerDenominazioneeStato(String nomeArea, String nomeStato) throws RemoteException {
+    public AreaGeografica cercaAreaGeograficaPerDenominazioneeStato(String nomeArea, String nomeStato) throws RemoteException, DatabaseConnectionException {
         return database.cercaAreaGeograficaPerDenominazioneeStato(nomeArea, nomeStato);
     }
 
@@ -147,7 +148,7 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
      * @throws RemoteException Se si verifica un errore di comunicazione remota.
      */
     @Override
-    public AreaGeografica cercaPerCoordinate(double latitudine, double longitudine) throws RemoteException, ConnessioneNonAttivaException {
+    public AreaGeografica cercaPerCoordinate(double latitudine, double longitudine) throws RemoteException, DatabaseConnectionException {
         return database.cercaPerCoordinate(latitudine, longitudine);
     }
 
@@ -159,7 +160,7 @@ public class RemoteServiceImpl extends UnicastRemoteObject implements RemoteServ
      * @throws RemoteException Se si verifica un errore di comunicazione remota.
      */
     @Override
-    public ParametriClimatici visualizzaDatiClimatici(String area) throws RemoteException {
+    public ParametriClimatici visualizzaDatiClimatici(String area) throws RemoteException, DatabaseConnectionException {
         return database.visualizzaDatiClimatici(area);
     }
 

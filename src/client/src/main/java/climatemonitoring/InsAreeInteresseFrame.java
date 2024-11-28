@@ -121,12 +121,14 @@ public class InsAreeInteresseFrame extends JFrame {
             } catch (RemoteException | NotBoundException ex) {
                 showErrorMessage("Errore di connessione", "Errore di Sistema");
                 ex.printStackTrace();
+                throw new RuntimeException(ex);
             }
         });
         backButton.addActionListener(e -> {
             try {
                 backin();
             } catch (NotBoundException | RemoteException ex) {
+                showErrorMessage("Errore di connessione", "Errore di Sistema");
                 throw new RuntimeException(ex);
             }
         });
@@ -279,6 +281,7 @@ public class InsAreeInteresseFrame extends JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -304,8 +307,7 @@ public class InsAreeInteresseFrame extends JFrame {
             default:
                 if (risultato > 0) {
                     showInfoMessage("Inserimento area di interesse con id: " + risultato + " eseguito con successo");
-                    new AreaRiservataOperatorFrame();
-                    dispose();
+
                 }
         }
     }

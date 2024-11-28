@@ -205,7 +205,7 @@ public class ClientLoginGUI extends JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Errore di connessione al server: "  + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
-
+            throw new RuntimeException();
         }
     }
 

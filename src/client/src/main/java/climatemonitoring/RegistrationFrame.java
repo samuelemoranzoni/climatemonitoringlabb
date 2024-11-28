@@ -2,6 +2,8 @@ package climatemonitoring;
 
 
 
+import climatemonitoring.extensions.DatabaseConnectionException;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
@@ -135,6 +137,7 @@ public class RegistrationFrame extends JFrame {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Errore durante la registrazione: " + ex.getMessage(),
                         "Errore", JOptionPane.ERROR_MESSAGE);
+                throw  new RuntimeException(ex);
             }
         });
 
@@ -179,7 +182,14 @@ public class RegistrationFrame extends JFrame {
         comboBox.setPreferredSize(new Dimension(250, 30));
         try {
             comboBox.addItem("Nessun centro"); // Prima opzione
-            List<String> centri = stub.getCentriRegistrati(0);
+            List<String> centri = null;
+            try {
+                centri = stub.getCentriRegistrati(0);
+            } catch (DatabaseConnectionException e) {
+                JOptionPane.showMessageDialog(this, "Errore di connessione al database",
+                        "Errore", JOptionPane.ERROR_MESSAGE);
+                throw new RuntimeException(e);
+            }
             for (String centro : centri) {
                 comboBox.addItem(centro);
             }
@@ -189,6 +199,7 @@ public class RegistrationFrame extends JFrame {
                     "Errore nel caricamento delle aree: " + ex.getMessage(),
                     "Errore",
                     JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException(ex);
         }
         return comboBox;
     }

@@ -2,6 +2,8 @@ package climatemonitoring;
 
 
 
+import climatemonitoring.extensions.DatabaseConnectionException;
+
 import javax.swing.*;
 import java.awt.*;
 import java.rmi.NotBoundException;
@@ -28,7 +30,7 @@ public class VisualizzaCommentiFrame extends JFrame {
      * @throws NotBoundException Se il servizio remoto non è registrato nel registry.
      * @throws RemoteException In caso di errore nella comunicazione remota.
      */
-    public VisualizzaCommentiFrame(String area)  {
+    public VisualizzaCommentiFrame(String area) throws DatabaseConnectionException {
         this.areaDaCercare = area;
         Registry registry = null;
         try {
@@ -42,9 +44,9 @@ public class VisualizzaCommentiFrame extends JFrame {
         } catch (NotBoundException e) {
             JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
+
+
         }
-
-
     }
 
     /**
@@ -184,12 +186,6 @@ public class VisualizzaCommentiFrame extends JFrame {
      * @param args Argomenti della riga di comando (non utilizzati).
      */
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                new VisualizzaCommentiFrame("Roma");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+
     }
 }

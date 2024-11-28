@@ -1,6 +1,8 @@
 package climatemonitoring;
 
 
+import climatemonitoring.extensions.DatabaseConnectionException;
+
 import javax.swing.*;
 import java.awt.*;
 import java.rmi.NotBoundException;
@@ -48,6 +50,10 @@ public class VisualizzaParametriFrame extends JFrame {
         } catch (NotBoundException e) {
             JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
+        } catch (DatabaseConnectionException e) {
+            JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException(e);
+
         }
 
         initializeUI();
@@ -145,6 +151,8 @@ public class VisualizzaParametriFrame extends JFrame {
                     throw new RuntimeException(ex);
                 } catch (RemoteException ex) {
                     throw new RuntimeException(ex);
+                } catch (DatabaseConnectionException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
         });
@@ -189,7 +197,7 @@ public class VisualizzaParametriFrame extends JFrame {
      * @throws NotBoundException
      * @throws RemoteException
      */
-    private void visualizzacommentiin() throws NotBoundException, RemoteException {
+    private void visualizzacommentiin() throws NotBoundException, RemoteException, DatabaseConnectionException {
         new VisualizzaCommentiFrame(this.areadiricerca);
         this.dispose();
     }
@@ -279,8 +287,10 @@ public class VisualizzaParametriFrame extends JFrame {
      *
      * @return Un oggetto climatemonitoring.climatemonitoring.model.climatemonitoring.ParametriClimatici con dati di esempio.
      */
-    private ParametriClimatici ottieniparametri(String area) throws RemoteException {
-      return  stub.visualizzaDatiClimatici(area);
+    private ParametriClimatici ottieniparametri(String area) throws DatabaseConnectionException, RemoteException {
+
+            return  stub.visualizzaDatiClimatici(area);
+
     }
 
     // Metodo main per testare il frame

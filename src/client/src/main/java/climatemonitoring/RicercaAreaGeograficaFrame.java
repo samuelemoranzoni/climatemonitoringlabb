@@ -1,6 +1,6 @@
 package climatemonitoring;
 
-import climatemonitoring.extensions.ConnessioneNonAttivaException;
+import climatemonitoring.extensions.DatabaseConnectionException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -123,21 +123,31 @@ public class RicercaAreaGeograficaFrame extends JFrame {
 
         // Eventi
         cercaPerNomeButton.addActionListener(e -> {
-            cercaPerNomeèStato();
+            try {
+                cercaPerNomeèStato();
+            } catch (DatabaseConnectionException ex) {
+                mostraErrore("Errore di connessione al server: " + ex.getMessage());
+                throw new RuntimeException(ex);
+            }
         });
         cercaPerCoordinateButton.addActionListener(e -> {
+
             try {
                 cercaPerCoordinate();
-            } catch (ConnessioneNonAttivaException ex) {
-                throw new RuntimeException(ex.getMessage());
+            } catch (DatabaseConnectionException ex) {
+                mostraErrore("Errore di connessione al database: " + ex.getMessage());
+                throw new RuntimeException(ex);
             }
+
         });
         visualizzaButton.addActionListener(e -> {
             try {
                 visualizza();
             } catch (NotBoundException ex) {
+                mostraErrore("Errore di connessione al server: " + ex.getMessage());
                 throw new RuntimeException(ex);
             } catch (RemoteException ex) {
+                mostraErrore("Errore di connessione al server: " + ex.getMessage());
                 throw new RuntimeException(ex);
             }
         });
@@ -325,7 +335,7 @@ public class RicercaAreaGeograficaFrame extends JFrame {
      *
      * @throws RemoteException se si verifica un errore durante la comunicazione con il servizio remoto.
      */
-    private void cercaPerNomeèStato()  {
+    private void cercaPerNomeèStato() throws DatabaseConnectionException {
         String denominazione = denominazioneField.getText().trim();
         String stato = statoField.getText().trim();
 
@@ -340,7 +350,7 @@ public class RicercaAreaGeograficaFrame extends JFrame {
     } catch (RemoteException e) {
     mostraErrore("Errore di connessione al server: " + e.getMessage());
     }
-    mostraRisultati(); // Mostra i risultati dopo la ricerca
+        mostraRisultati(); // Mostra i risultati dopo la ricerca
 }
 
     /**
@@ -348,7 +358,7 @@ public class RicercaAreaGeograficaFrame extends JFrame {
      *
      * @throws RemoteException se si verifica un errore durante la comunicazione con il servizio remoto.
      */
-    private void cercaPerCoordinate() throws ConnessioneNonAttivaException {
+    private void cercaPerCoordinate() throws DatabaseConnectionException {
         try {
             double lat = Double.parseDouble(latitudineField.getText().trim().replace(",", "."));
             double lon = Double.parseDouble(longitudineField.getText().trim().replace(",", "."));
@@ -358,9 +368,8 @@ public class RicercaAreaGeograficaFrame extends JFrame {
         } catch (NumberFormatException ex) {
             mostraErrore("Inserire coordinate valide");
         } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        } catch (ConnessioneNonAttivaException e) {
-            throw new ConnessioneNonAttivaException("errore");
-        }
+            mostraErrore("Errore di connessione col server");
+
+    }
     }
 }

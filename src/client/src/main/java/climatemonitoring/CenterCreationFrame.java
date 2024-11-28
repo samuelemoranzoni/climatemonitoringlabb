@@ -262,12 +262,13 @@ public class CenterCreationFrame extends JFrame {
                 // Aggiorno il centro dell'operatore che sta lavorando ora
                 OperatoreSession.getInstance().getOperatore().setCentroMonitoraggioId(risultato);
                 System.out.println("Aggiorno il centro ID dell'operatore che sta lavorando ora");
-                new AreaRiservataOperatorFrame().setVisible(true);
-                this.dispose();
+
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+
             e.printStackTrace();
+            throw new RuntimeException(e);
 
         }
     }

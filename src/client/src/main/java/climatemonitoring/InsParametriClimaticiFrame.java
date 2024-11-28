@@ -317,7 +317,7 @@ public class InsParametriClimaticiFrame extends JFrame {
                     precipitazioniField.getText().isEmpty() ||
                     altitudineGhiacciaiField.getText().isEmpty() ||
                     massaGhiacciaiField.getText().isEmpty()) {
-                  JOptionPane.showMessageDialog(this, "Compila tutti i campi prima di salvare i parametri(eccetto i campi che si riferiscono alle note)", "Errore", JOptionPane.ERROR_MESSAGE);
+                  JOptionPane.showMessageDialog(this, "Tutti i campi eccetto i campi che si riferiscono alle note vanno compilati obbligatoriamente prima di salvare i parametri", "Errore", JOptionPane.ERROR_MESSAGE);
                   return;
               }
             // Recupero dei valori dai campi di testo e spinner
@@ -410,11 +410,10 @@ public class InsParametriClimaticiFrame extends JFrame {
             } else if (risposta == -7) {
                 JOptionPane.showMessageDialog(this, "Errore: i parametri climatici devono essere valori positivi. Verifica e correggi i valori.", "Errore", JOptionPane.ERROR_MESSAGE);
             } else if (risposta == -8) {
-                JOptionPane.showMessageDialog(this, "Errore: inserimento fallito per cause non specifiche. Riprova più tardi.", "Errore", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Errore: inserimento fallito per errore di connessione .Riprova più tardi.", "Errore", JOptionPane.ERROR_MESSAGE);
             } else if (risposta > 0) {
                 JOptionPane.showMessageDialog(this, "Inserimento dei parametri climatici riuscito con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-                new AreaRiservataOperatorFrame().setVisible(true);
-                dispose();
+
             } else {
                 JOptionPane.showMessageDialog(this, "Errore sconosciuto. Codice di risposta: " + risposta, "Errore", JOptionPane.ERROR_MESSAGE);
             }
@@ -423,7 +422,9 @@ public class InsParametriClimaticiFrame extends JFrame {
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(null, "Errore nei dati inseriti. Assicurati che tutti i numeri siano validi.", "Errore", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException(ex);
         } catch (AccessException e) {
+            JOptionPane.showMessageDialog(null, "Errore nei dati inseriti. Assicurati che tutti i numeri siano validi.", "Errore", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException(e);
         } catch (RemoteException e) {
             JOptionPane.showMessageDialog(this, "Errore di connessione al server: " + e.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
