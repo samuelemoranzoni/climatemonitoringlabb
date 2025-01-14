@@ -253,7 +253,7 @@ public class RicercaAreaGeograficaFrame extends JFrame {
     private void mostraRisultati() {
         risultatoPanel.removeAll(); // Pulisce i risultati precedenti
 
-        //area restituita da stub se occorre un errore di connessione durante la ricerca dell'area
+       /* //area restituita da stub se occorre un errore di connessione durante la ricerca dell'area
         if(area.equals(new AreaGeografica("-1","-1",0,0))){
             mostraErrore("errore di connessione al database");
             JLabel noResults = new JLabel("Nessun'area trovata");
@@ -263,7 +263,8 @@ public class RicercaAreaGeograficaFrame extends JFrame {
             visualizzaButton.setEnabled(false); // Disabilita il bottone Visualizza
 
         }
-        else  if (area == null) {
+        */
+        if (area == null) {
             JLabel noResults = new JLabel("Nessun'area trovata");
             noResults.setFont(LABEL_FONT);
             noResults.setAlignmentX(Component.CENTER_ALIGNMENT);

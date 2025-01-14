@@ -1,0 +1,4 @@
+climatemonitoring\ServerRMI.class
+climatemonitoring\DatabaseConnection.class
+climatemonitoring\RemoteService.class
+climatemonitoring\RemoteServiceImpl.class

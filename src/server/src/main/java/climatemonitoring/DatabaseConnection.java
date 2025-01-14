@@ -19,40 +19,40 @@ import java.util.List;
 public class DatabaseConnection {
 
     private static Connection connection = null;
-
-     private static final String URL = "jdbc:postgresql://localhost:5432/postgres";
-    private  static final String USER = "postgres";
-    private  static final String PASSWORD = "labb18";
-
-     private static final String HOST=null;
     private static OperatoreRegistrato op;
 
     /**
-     * Metodo per richiedere l'accesso al database tramite credenziali fornite dall'utente.
-     * Chiede host e password, verifica la connessione e restituisce true se l'accesso ha successo.
+     * Metodo per verificare le credenziali del database fornendo host e password.
+     * Prova a stabilire una connessione e restituisce true se l'accesso è riuscito.
      *
-     * @return true se l'accesso al database è riuscito, false altrimenti.
+     * @param host l'indirizzo host del database (es. localhost:5432)
+     * @param password la password per l'accesso al database
+     * @return true se la connessione è stata stabilita correttamente, false altrimenti
      */
-    public boolean checkcredentials(String host,String password) {
-        String dbHost=host;
-        String dbPassword=password;
-        if(dbHost.equals("localhost:5432") && dbPassword.equals(PASSWORD)){
-                return true;
-        } else {
+    public boolean checkcredentials(String host, String user , String password , String nome_database) {
+        String testURL = "jdbc:postgresql://" + host + "/" + nome_database;
+        try (Connection testConnection = DriverManager.getConnection(testURL, user , password)) {
+            System.out.println("Connessione verificata con successo.");
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Connessione fallita: " + e.getMessage());
             return false;
         }
-
     }
+
     /**
-     * Stabilisce una connessione con il database.
+     * Stabilisce una connessione con il database utilizzando host e password forniti.
      *
+     * @param host l'indirizzo host del database (es. localhost:5432)
+     * @param password la password per l'accesso al database
      * @return una connessione al database o null se si è verificato un errore.
      */
-    public Connection connetti() {
+    public Connection connetti(String host, String user , String password, String nome_database) {
         if (connection == null) {
+            String dynamicURL = "jdbc:postgresql://" + host + "/" + nome_database;
             try {
                 Class.forName("org.postgresql.Driver");
-                connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                connection = DriverManager.getConnection(dynamicURL, user, password);
                 System.out.println("Connessione al database stabilita.");
             } catch (SQLException e) {
                 System.err.println("Errore di connessione: " + e.getMessage());
@@ -154,7 +154,7 @@ public class DatabaseConnection {
             return new OperatoreRegistrato(-1);
 
         }
-
+//operazione fallita
         return new OperatoreRegistrato(-1);
     }
 

@@ -5,8 +5,9 @@ package climatemonitoring;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.Objects;
 import javax.imageio.ImageIO;
 
 /**
@@ -32,15 +33,39 @@ public class ClimateMonitoringGUI extends JFrame {
         setLocationRelativeTo(null); // Posiziona il frame al centro
 
         // Carica l'immagine di sfondo
-        try {
-            File imageFile = new File("C:\\Users\\samuele\\OneDrive\\Desktop\\UFV\\climate monitoring image.jpeg");
+       /* try {
+            File imageFile = new File("data/img.jpeg");
             backgroundImage = ImageIO.read(imageFile);
         } catch (Exception e) {
             System.err.println("Errore nel caricamento dell'immagine: " + e.getMessage());
             // Continua senza immagine invece di crashare
             backgroundImage = null;
             e.printStackTrace();
+        }*/
+
+/*
+       // Carica l'immagine di sfondo
+        try {
+            backgroundImage = ImageIO.read(getClass().getResourceAsStream("img.jpeg"));
+        } catch (Exception e) {
+            System.err.println("Errore nel caricamento dell'immagine: " + e.getMessage());
+            backgroundImage = null;
+            e.printStackTrace();
+        }  */
+
+        // Usa il ClassLoader per caricare il file
+        try {
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("img.jpeg");
+            if (inputStream == null) {
+                throw new FileNotFoundException("File img.jpeg non trovato nel classpath.");
+            }
+            backgroundImage = ImageIO.read(inputStream);
+            System.out.println("Immagine caricata con successo.");
+        } catch (Exception e) {
+            System.err.println("Errore nel caricamento dell'immagine: " + e.getMessage());
+            e.printStackTrace();
         }
+
 
         // Crea un pannello personalizzato con l'immagine di sfondo
         JPanel panel = new JPanel() {
@@ -114,6 +139,6 @@ public class ClimateMonitoringGUI extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new ClimateMonitoringGUI().setVisible(true);
-        });
+        });}
+
     }
-}

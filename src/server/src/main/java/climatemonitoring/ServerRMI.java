@@ -19,8 +19,10 @@ public class ServerRMI {
     public static void main(String[] args) throws RemoteException, MalformedURLException {
         try {
             dc=new DatabaseConnection();
-            String dbPassword;
-            String dbHost;
+            String dbPassword=null;
+            String dbHost=null;
+            String dbUser=null;
+            String nome_database=null;
             int tentativi = 3;
             boolean running=true;
             Scanner scanner = new Scanner(System.in);
@@ -29,11 +31,14 @@ public class ServerRMI {
 
                 System.out.println("Inserisci l'host del database (es. localhost:5432):");
                 dbHost = scanner.nextLine().trim();
-
+                System.out.println("Inserisci lo user admin del database");
+                dbUser= scanner.nextLine().trim();
                 System.out.println("Inserisci la password del database:");
                 dbPassword = scanner.nextLine().trim();
+                System.out.println("Inserisci il nome del database");
+                nome_database= scanner.nextLine();
 
-                if (dc.checkcredentials(dbHost,dbPassword)) {
+                if (dc.checkcredentials(dbHost,dbUser,dbPassword,nome_database)) {
                     System.out.println("Credenziali corrette , accesso in corso ...");
                     break;
 
@@ -48,7 +53,8 @@ public class ServerRMI {
                 }
                 }
             // L'oggetto usato dal server per connettersi al database si connette
-            dc.connetti();
+
+            dc.connetti(dbHost,dbUser,dbPassword,nome_database);
             // Crea l'oggetto remoto
             RemoteServiceImpl remoteService = new RemoteServiceImpl(dc);
 
