@@ -87,7 +87,7 @@ public class InsParametriClimaticiFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Errore: Non puoi inserire parametri se non lavori per nessun centro. Accederai alla pagina ma non potrai effettuare inserimenti", "Errore", JOptionPane.ERROR_MESSAGE);
                 dispose();
             }
-
+            areaComboBox.addItem("Nessuna area selezionata"); //prima opzione
             List<String> aree = stub.getareeosservatedalcentro(centroMonitoraggioId);
             for (String area : aree) {
                 areaComboBox.addItem(area);
@@ -97,7 +97,12 @@ public class InsParametriClimaticiFrame extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     areaSelezionata = (String) areaComboBox.getSelectedItem();
-                    System.out.println("Area selezionata: " + areaSelezionata);
+                    if(areaSelezionata.equals("Nessuna area selezionata")){
+                        JOptionPane.showMessageDialog(null, "Nessun' area selezionata" ,"Inserisci un 'area valida", JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        System.out.println("Area selezionata: " + areaSelezionata);
+                    }
                 }
             });
 

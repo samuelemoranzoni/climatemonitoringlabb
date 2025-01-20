@@ -32,26 +32,6 @@ public class ClimateMonitoringGUI extends JFrame {
         setSize(800, 600);
         setLocationRelativeTo(null); // Posiziona il frame al centro
 
-        // Carica l'immagine di sfondo
-       /* try {
-            File imageFile = new File("data/img.jpeg");
-            backgroundImage = ImageIO.read(imageFile);
-        } catch (Exception e) {
-            System.err.println("Errore nel caricamento dell'immagine: " + e.getMessage());
-            // Continua senza immagine invece di crashare
-            backgroundImage = null;
-            e.printStackTrace();
-        }*/
-
-/*
-       // Carica l'immagine di sfondo
-        try {
-            backgroundImage = ImageIO.read(getClass().getResourceAsStream("img.jpeg"));
-        } catch (Exception e) {
-            System.err.println("Errore nel caricamento dell'immagine: " + e.getMessage());
-            backgroundImage = null;
-            e.printStackTrace();
-        }  */
 
         // Usa il ClassLoader per caricare il file
         try {
